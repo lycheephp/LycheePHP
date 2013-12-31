@@ -198,7 +198,6 @@ class Driver
     public function query($sql, array $params = array())
     {
         $this->connect();
-        $result = array();
         try {
             $statement = $this->pdo->prepare($sql);
             //绑定sql语句参数

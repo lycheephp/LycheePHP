@@ -1,10 +1,10 @@
 <?php
+namespace Lychee;
+
 /**
  * 荔枝类库配置类
  * @author Samding
  */
-namespace Lychee;
-
 class Config
 {
 

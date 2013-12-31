@@ -1,11 +1,11 @@
 <?php
+namespace Lychee;
+
 /**
  * 荔枝类库入口脚本
  * 执行必须初始化工作
  * @author Samding
  */
-namespace Lychee;
-
 defined('LYCHEE_ROOT') || define('LYCHEE_ROOT', dirname(__FILE__));
 include LYCHEE_ROOT .DIRECTORY_SEPARATOR . 'Autoload.php';
 

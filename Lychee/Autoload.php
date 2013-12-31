@@ -1,10 +1,10 @@
 <?php
+namespace Lychee;
+
 /**
  * 自动加载类
  * @author Samding
  */
-namespace Lychee;
-
 class Autoload
 {
     /**

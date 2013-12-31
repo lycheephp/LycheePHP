@@ -1,10 +1,10 @@
 <?php
+namespace Lychee\DB;
+
 /**
  * MySQL数据库驱动
  * @author Samding
  */
-namespace Lychee\DB;
-
 class Driver
 {
 

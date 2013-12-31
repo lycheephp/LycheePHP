@@ -17,6 +17,7 @@ namespace Lychee\Base\DB;
 /**
  * MySQL数据库驱动
  * @author Samding
+ * @package Lychee\Base\DB
  */
 class Driver
 {

@@ -17,6 +17,7 @@ namespace Lychee\Base\DB;
 /**
  * ActiveRecord实现
  * @author Samding
+ * @package Lychee\Base\DB
  */
 class ActiveRecord
 {

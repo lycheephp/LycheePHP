@@ -95,11 +95,15 @@ class ActiveRecord
 
     /**
      * 构造器
-     * @param Driver $driver
+     * @param string $db_name
+     * @param string $tbl_name
+     * @param array $config
      */
-    public function __construct(Driver $driver)
+    public function __construct($db_name, $tbl_name, $config)
     {
-        $this->driver = $driver;
+        $this->driver = Driver::getInstance();
+        $this->db_name = $db_name;
+        $this->tbl_name = $tbl_name;
         $this->reset();
     }
 

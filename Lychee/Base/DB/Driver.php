@@ -52,16 +52,39 @@ class Driver
     private $affected_rows = 0;
 
     /**
+     * 实例
+     * @var Driver
+     */
+    private static $instance = null;
+
+    /**
      * 构造器
      * @param $host
      * @param $port
      * @param $username
      * @param $password
      */
-    public function __construct($host, $port, $username, $password)
+    private function __construct($host, $port, $username, $password)
     {
         $this->pdo = null;
         $this->dsn = "mysql:host={$host};port={$port}";
+    }
+
+    /**
+     * 获取实例
+     * @param array $config
+     * @return Driver
+     */
+    public static function getInstance(array $config = array())
+    {
+        if (!empty($config)) {
+            $host = isset($config['host'])?$config['host']:'localhost';
+            $port = isset($config['port'])?$config['port']:3306;
+            $username = isset($config['username'])?$config['username']:'root';
+            $password = isset($config['password'])?$config['password']:'';
+            self::$instance = new Driver($host, $port, $username, $password);
+        }
+        return self::$instance;
     }
 
     /**

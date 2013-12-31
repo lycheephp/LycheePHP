@@ -17,6 +17,7 @@ namespace Lychee\Base\DB;
 /**
  * 数据库运算符
  * @author Samding
+ * @package Lychee\Base\DB
  */
 class Operator
 {

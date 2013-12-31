@@ -16,6 +16,7 @@ namespace Lychee;
 
 /**
  * 荔枝类库配置类
+ * @package Lychee
  * @author Samding
  */
 class Config

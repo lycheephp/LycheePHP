@@ -17,6 +17,7 @@ namespace Lychee;
 /**
  * 自动加载类
  * @author Samding
+ * @package Lychee
  */
 class Autoload
 {

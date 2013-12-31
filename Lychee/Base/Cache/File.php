@@ -28,10 +28,16 @@ class File
     private $cache_dir;
 
     /**
+     * 实例
+     * @var File
+     */
+    private static $instance = null;
+
+    /**
      * 构造器
      * @param string $cache_dir
      */
-    public function __construct($cache_dir)
+    private function __construct($cache_dir)
     {
         if (!file_exists($cache_dir)) {
             mkdir($cache_dir, 0777, true);
@@ -41,6 +47,20 @@ class File
             $cache_dir = dirname($cache_dir);
         }
         $this->cache_dir = $cache_dir;
+    }
+
+    /**
+     * 获取实例
+     * @param array $config
+     * @return File
+     */
+    public static function getInstance(array $config = array())
+    {
+        if (!empty($config)) {
+            $cache_dir = isset($config['cache_dir'])?$config['cache_dir']:LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'cache';
+            self::$instance = new File($cache_dir);
+        }
+        return self::$instance;
     }
 
     /**

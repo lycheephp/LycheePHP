@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Lychee\DB;
+namespace Lychee\Base\DB;
 
 /**
  * 数据库运算符

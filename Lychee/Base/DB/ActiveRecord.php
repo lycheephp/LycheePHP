@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Lychee\DB;
+namespace Lychee\Base\DB;
 
 /**
  * ActiveRecord实现
@@ -38,6 +38,12 @@ class ActiveRecord
      * @var string
      */
     protected $tbl_name;
+
+    /**
+     * SQL语句参数
+     * @var array
+     */
+    private $params;
 
     /**
      * 数据
@@ -102,6 +108,7 @@ class ActiveRecord
      */
     private function reset()
     {
+        $this->params = array();
         $this->data = array();
         $this->where_str = '';
         $this->join_str = array();
@@ -165,6 +172,28 @@ class ActiveRecord
     }
 
     /**
+     * 设置参数值
+     * @param array $data
+     * @return array
+     */
+    private function separateParams(array $data)
+    {
+        $params = array();
+        $data = array();
+        $callback = function ($value, $key) use (&$params, &$data)
+        {
+            $param_name = ":{$key}";
+            $param_value = $value;
+            $params[$param_name] = $param_value;
+
+            $data[$key] = $param_name;
+        };
+        array_walk($data, $callback);
+        $this->params = $params;
+        return $data;
+    }
+
+    /**
      * 获取数据设置子句
      * 关联数组转换成xxx=xxx, yyy=yyy的sql语句形式
      * @param array $data
@@ -175,7 +204,13 @@ class ActiveRecord
         $output = array();
         $callback = function($value, $key) use (&$output)
         {
-            $output[] = "`{$key}` = '{$value}'";
+            if (strpos($value, ':') === 0) {
+                $output[] = "`{$key}` = {$value}";
+            }
+            else {
+                $output[] = "`{$key}` = '{$value}'";
+            }
+
         };
         array_walk($data, $callback);
         return implode(', ', $output);
@@ -185,13 +220,14 @@ class ActiveRecord
      * 执行sql查询
      * 返回查询数据
      * @param string $sql
+     * @param array $params
      * @throws \PDOException
      * @return array
      */
-    private function query($sql)
+    public function query($sql, array $params = array())
     {
         $this->last_sql = $sql;
-        $result = $this->driver->query($sql);
+        $result = $this->driver->query($sql, $params);
         $this->reset();
         return $result;
     }
@@ -200,13 +236,14 @@ class ActiveRecord
      * 执行sql
      * 返回影响行数
      * @param string $sql
+     * @param array $params
      * @throws \PDOException
      * @return int
      */
-    private function execute($sql)
+    public function execute($sql, array $params = array())
     {
         $this->last_sql = $sql;
-        $result = $this->driver->execute($sql);
+        $result = $this->driver->execute($sql, $params);
         $this->reset();
         return $result;
     }
@@ -386,11 +423,11 @@ class ActiveRecord
         if (empty($data)) {
             return 0;
         }
-        $data = $this->escapeArray($data);
+        $data = $this->separateParams($data);
         $field_str = $this->getDataStr($data);
         $from_str = $this->getFromStr();
         $sql = "INSERT INTO {$from_str} SET {$field_str}";
-        $this->execute($sql);
+        $this->execute($sql, $this->params);
         return $this->getLastID();
     }
 
@@ -629,14 +666,14 @@ class ActiveRecord
         if (empty($data) || empty($this->where_str)) {
             return 0;
         }
-        $data = $this->escapeArray($data);
+        $data = $this->separateParams($data);
         $field_str = $this->getDataStr($data);
         $from_str = $this->getFromStr();
         $sql = "UPDATE {$from_str} SET {$field_str} WHERE {$this->where_str}";
         if (!empty($this->limit_str)) {
             $sql .= " LIMIT {$this->limit_str}";
         }
-        $result = $this->execute($sql);
+        $result = $this->execute($sql, $this->params);
         return $result;
     }
 

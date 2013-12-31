@@ -19,5 +19,5 @@ Autoload::init();
  */
 function lychee_init(array $config = array())
 {
-
+    Config::load($config);
 }

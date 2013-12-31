@@ -45,9 +45,10 @@ class Config
      * @param string $category 分类
      * @param string $name 配置项
      * @param mixed $default 无此项目时返回该参数，默认为null
+     * @return mixed
      */
     public static function get($category, $name, $default = null)
     {
-
+        return isset(self::$data[$category][$name])?self::$data[$category][$name]:$default;
     }
 }

@@ -270,4 +270,21 @@ class Driver
         $this->query($sql, $params);
         return $this->affected_rows;
     }
+
+    /**
+     * 关闭数据库连接
+     */
+    public function close()
+    {
+        $this->connect();
+        unset($this->pdo);
+    }
+
+    /**
+     * 析构器
+     */
+    public function __destruct()
+    {
+        $this->close();
+    }
 }

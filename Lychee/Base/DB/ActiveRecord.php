@@ -100,9 +100,9 @@ class ActiveRecord
      * @param string $tbl_name
      * @param array $config
      */
-    public function __construct($db_name, $tbl_name, $config)
+    public function __construct($db_name, $tbl_name, array $config = array())
     {
-        $this->driver = Driver::getInstance();
+        $this->driver = Driver::getInstance($config);
         $this->db_name = $db_name;
         $this->tbl_name = $tbl_name;
         $this->reset();
@@ -338,7 +338,7 @@ class ActiveRecord
     public function field($field, $secure = true)
     {
         if (empty($field)) {
-            $this->field_str = '';
+            $this->field_str = '*';
             return $this;
         }
         if (is_array($field)) {
@@ -455,7 +455,7 @@ class ActiveRecord
             $target_str = $this->escapeString($value);
             break;
         }
-        if (strpos($target_str, '.')!== false) {
+        if (strpos($target_str, '.') !== false) {
             $target_str = preg_replace("/^(.*?)\.(.*?)$/is", "`$1`.`$2`", $target_str);
         }
         else {
@@ -507,7 +507,7 @@ class ActiveRecord
      */
     public function max($field)
     {
-        $this->field("max({$field}) AS max", false);
+        $this->field("MAX(`{$field}``) AS max", false);
         $list = $this->selectRow();
         $result = 0;
         if (count($list) == 1) {
@@ -616,7 +616,6 @@ class ActiveRecord
             $sql .= " LIMIT {$this->limit_str}";
         }
         $list = $this->query($sql);
-        $this->reset();
         return $list;
     }
 
@@ -705,14 +704,13 @@ class ActiveRecord
                     $value = $this->escapeString($value);
                     $output[$key] = "'$value'";
                 };
-                array_walk($condition, $callback);
+                array_walk($value, $callback);
                 $value_temp = implode(', ', $output);
                 $result = "`{$field}` {$type_temp} ({$value_temp})";
             }
             elseif (in_array($key, array(Operator::QUERY_EQUAL, Operator::QUERY_GT, Operator::QUERY_GTE, Operator::QUERY_LT, Operator::QUERY_LTE, Operator::QUERY_NE))) {
                 $type_temp = ltrim($key, '$');
-                $value_temp = isset($value)?$this->escapeString($value):0;
-                $result = "`$field` {$type_temp} '{$value_temp}'";
+                $result = "`$field` {$type_temp} '{$value}'";
             }
             elseif ($key == Operator::QUERY_LIKE) {
                 $value = $this->escapeString($value);

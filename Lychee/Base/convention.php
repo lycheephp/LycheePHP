@@ -28,4 +28,6 @@ return array(
     ),
     //缓存配置
     'cache' => array(),
+    //日志配置
+    'log' => array(),
 );

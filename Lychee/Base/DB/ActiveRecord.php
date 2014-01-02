@@ -184,7 +184,6 @@ class ActiveRecord
     private function separateParams(array $data)
     {
         $params = array();
-        $data = array();
         $callback = function ($value, $key) use (&$params, &$data)
         {
             $param_name = ":{$key}";

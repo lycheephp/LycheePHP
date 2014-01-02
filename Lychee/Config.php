@@ -96,13 +96,15 @@ class Config
     public static function get($name, $default = null)
     {
         $path = explode('.', $name);
+        $len = count($path);
         $result = null;
-        foreach ($path as $item) {
-            if (is_null($result)) {
-                $result = isset(self::$data[$item])?self::$data[$item]:null;
+        for ($i = 0; $i < $len; $i++) {
+            $key = $path[$i];
+            if ($i == 0) {
+                $result = isset(self::$data[$key])?self::$data[$key]:null;
             }
             else {
-                $result = isset($result[$item])?$result[$item]:null;
+                $result = isset($result[$key])?$result[$key]:null;
             }
             if (is_null($result)) {
                 $result = $default;

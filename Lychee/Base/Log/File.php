@@ -42,15 +42,15 @@ class File
      * 日志路径
      * @var string
      */
-    private $log_path;
+    private $log_dir;
 
     /**
      * 构造器
-     * @param string $log_path
+     * @param string $log_dir
      */
-    public function __construct($log_path)
+    public function __construct($log_dir)
     {
-        $this->log_path = $log_path;
+        $this->log_dir = $log_dir;
     }
 
     /**
@@ -58,10 +58,10 @@ class File
      * @param $level
      * @return string
      */
-    private function getLogPath($level)
+    private function getLogFilePath($level)
     {
         $datetime = date('Y-m-d'); //获取当前日期
-        $log_path = $this->log_path . DIRECTORY_SEPARATOR . $datetime . DIRECTORY_SEPARATOR . $level . '.txt';
+        $log_path = $this->log_dir . DIRECTORY_SEPARATOR . $datetime . DIRECTORY_SEPARATOR . $level . '.txt';
         return $log_path;
     }
 
@@ -257,7 +257,7 @@ class File
         if (!empty($context)) {
             $lines[] = "Context:" . $this->getContextStr($context);
         }
-        $log_path = $this->getLogPath($level);
+        $log_path = $this->getLogFilePath($level);
         $this->write($log_path, $lines);
     }
 

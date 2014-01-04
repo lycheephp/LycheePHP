@@ -110,7 +110,7 @@ class File
      */
     public function __set($name, $value)
     {
-        $this->set($name, $value, 0);
+        $this->set($name, $value, 3600);
     }
 
     /**

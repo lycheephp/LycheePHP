@@ -42,15 +42,15 @@ class File
      * 日志路径
      * @var string
      */
-    private $log_path;
+    private $log_dir;
 
     /**
      * 构造器
-     * @param string $log_path
+     * @param string $log_dir
      */
-    public function __construct($log_path)
+    public function __construct($log_dir)
     {
-        $this->log_path = $log_path;
+        $this->log_dir = $log_dir;
     }
 
     /**
@@ -58,10 +58,10 @@ class File
      * @param $level
      * @return string
      */
-    private function getLogPath($level)
+    private function getLogFilePath($level)
     {
         $datetime = date('Y-m-d'); //获取当前日期
-        $log_path = $this->log_path . DIRECTORY_SEPARATOR . $datetime . $level . '.txt';
+        $log_path = $this->log_dir . DIRECTORY_SEPARATOR . $datetime . DIRECTORY_SEPARATOR . $level . '.txt';
         return $log_path;
     }
 
@@ -83,7 +83,7 @@ class File
         $lines[] = "|----------------------------------------------------------\r\n\r\n\r\n";
         foreach ($lines as $line) {
             $lines .= "\r\n";
-            fwrite($handle, $lines);
+            fwrite($handle, $line);
         }
         flock($handle, LOCK_UN);
         fclose($handle);
@@ -149,7 +149,7 @@ class File
     {
         $result = array();
         foreach ($context as $key => $value) {
-            $result[] = "{$key}={$value}";
+            $result[] = "{$key}:{$value}";
         }
         return implode(', ', $result);
     }
@@ -246,18 +246,18 @@ class File
         $level = trim($level);
         //生成日志信息
         $lines = array();
-        $lines[] = "Level:" . $level;
+        $lines[] = "LEVEL:" . $level;
         $lines[] = "TIME:" . date("Y-m-d H:i:s");
         $lines[] = "HTTP_REFERER:" . $_SERVER['HTTP_REFERER'];
         $lines[] = "GET:" . $this->getGetStr();
         $lines[] = "POST:" . $this->getPostStr();
         $lines[] = "SESSION:" . $this->getSessionStr();
         $lines[] = "COOKIE:" . $this->getCookieStr();
-        $lines[] = "Message:" . $message;
+        $lines[] = "MESSAGE:" . $message;
         if (!empty($context)) {
             $lines[] = "Context:" . $this->getContextStr($context);
         }
-        $log_path = $this->getLogPath($level);
+        $log_path = $this->getLogFilePath($level);
         $this->write($log_path, $lines);
     }
 

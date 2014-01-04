@@ -32,7 +32,7 @@ class Autoload
     /**
      * 开始执行自动加载
      */
-    public static function init()
+    public static function register()
     {
         $autoload = function($class_name)
         {

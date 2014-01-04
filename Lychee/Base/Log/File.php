@@ -83,7 +83,7 @@ class File
         $lines[] = "|----------------------------------------------------------\r\n\r\n\r\n";
         foreach ($lines as $line) {
             $lines .= "\r\n";
-            fwrite($handle, $lines);
+            fwrite($handle, $line);
         }
         flock($handle, LOCK_UN);
         fclose($handle);

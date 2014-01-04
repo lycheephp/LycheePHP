@@ -61,7 +61,7 @@ class File
     private function getLogPath($level)
     {
         $datetime = date('Y-m-d'); //获取当前日期
-        $log_path = $this->log_path . DIRECTORY_SEPARATOR . $datetime . $level . '.txt';
+        $log_path = $this->log_path . DIRECTORY_SEPARATOR . $datetime . DIRECTORY_SEPARATOR . $level . '.txt';
         return $log_path;
     }
 
@@ -149,7 +149,7 @@ class File
     {
         $result = array();
         foreach ($context as $key => $value) {
-            $result[] = "{$key}={$value}";
+            $result[] = "{$key}:{$value}";
         }
         return implode(', ', $result);
     }
@@ -246,14 +246,14 @@ class File
         $level = trim($level);
         //生成日志信息
         $lines = array();
-        $lines[] = "Level:" . $level;
+        $lines[] = "LEVEL:" . $level;
         $lines[] = "TIME:" . date("Y-m-d H:i:s");
         $lines[] = "HTTP_REFERER:" . $_SERVER['HTTP_REFERER'];
         $lines[] = "GET:" . $this->getGetStr();
         $lines[] = "POST:" . $this->getPostStr();
         $lines[] = "SESSION:" . $this->getSessionStr();
         $lines[] = "COOKIE:" . $this->getCookieStr();
-        $lines[] = "Message:" . $message;
+        $lines[] = "MESSAGE:" . $message;
         if (!empty($context)) {
             $lines[] = "Context:" . $this->getContextStr($context);
         }

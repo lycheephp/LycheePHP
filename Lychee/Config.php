@@ -71,7 +71,9 @@ class Config
 
         //检查传入的配置
         if (!isset($config['base'])) {
-            $config['base'] = $config;
+            $temp = array();
+            $temp['base'] = $config;
+            $config = $temp;
         }
         //合并配置
         $lychee_config = array_merge($convention_config, $config);

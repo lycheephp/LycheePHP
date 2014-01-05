@@ -231,7 +231,7 @@ class File
         $key = trim($name);
         $value = intval($offset);
         $file_path = $this->getFilePath($key);
-        if (!file_exists($file_path)) {
+        if (!filesize($file_path)) {
             //不存在则创建
             $this->set($key, 0, 0);
         }

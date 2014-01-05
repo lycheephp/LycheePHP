@@ -149,24 +149,28 @@ class Memcache
     /**
      * 删除缓存
      * @param string $name
+     * @return bool
      */
     public function del($name)
     {
         $this->connect();
         $key = trim($name);
         $key = md5(strtolower($key));
-        $this->memcache->delete($key);
+        return $this->memcache->delete($key);
     }
 
     /**
      * 删除多个缓存
      * @param array $keys
+     * @return bool
      */
     public function delMulti(array $keys)
     {
+        $flag = true;
         foreach ($keys as $value) {
-            $this->del($value);
+            $flag = $this->del($value) && $flag;
         }
+        return $flag;
     }
 
     /**
@@ -230,26 +234,30 @@ class Memcache
      * @param string $name
      * @param mixed $value
      * @param int $life_time 缓存有效期，单位（秒）
+     * @return bool
      */
     public function set($name, $value, $life_time = 3600)
     {
         $this->connect();
         $key = trim($name);
         $key = md5(strtolower($key));
-        $this->memcache->set($key, $value, null, $life_time);
+        return $this->memcache->set($key, $value, null, $life_time);
     }
 
     /**
      * 设置多个缓存
      * @param array $items
      * @param int $life_time
+     * @return bool
      */
     public function setMulti(array $items, $life_time=3600)
     {
-        $callback = function($value, $key) use ($life_time)
+        $flag = true;
+        $callback = function($value, $key) use ($life_time, &$flag)
         {
-            $this->set($key, $value, $life_time);
+            $flag = $flag && $this->set($key, $value, $life_time);
         };
         array_walk($items, $callback);
+        return $flag;
     }
 }

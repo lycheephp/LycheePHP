@@ -14,6 +14,8 @@
  */
 namespace Lychee\Base\Cache;
 
+use Lychee;
+
 /**
  * 文件缓存类
  * @author Samding
@@ -51,13 +53,12 @@ class File
 
     /**
      * 获取实例
-     * @param array $config
      * @return File
      */
-    public static function getInstance(array $config = array())
+    public static function getInstance()
     {
-        if (!empty($config)) {
-            $cache_dir = isset($config['cache_dir'])?$config['cache_dir']:LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'cache';
+        if (is_null(self::$instance)) {
+            $cache_dir = Lychee\Config::get('base.cache.cache_dir');
             self::$instance = new File($cache_dir);
         }
         return self::$instance;

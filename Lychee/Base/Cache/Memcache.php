@@ -14,6 +14,8 @@
  */
 namespace Lychee\Base\Cache;
 
+use Lychee;
+
 /**
  * Memcache缓存类
  * @author Samding
@@ -58,14 +60,13 @@ class Memcache
 
     /**
      * 获取实例
-     * @param array $config
      * @return Memcache
      */
-    public static function getInstance(array $config = array())
+    public static function getInstance()
     {
         if (!empty($config)) {
-            $host = isset($config['host'])?$config['host']:'localhost';
-            $port = isset($config['port'])?$config['port']:11211;
+            $host = Lychee\Config::get('base.cache.host');
+            $port = Lychee\Config::get('base.cache.port');
             self::$instance = new Memcache($host, $port);
         }
         return self::$instance;

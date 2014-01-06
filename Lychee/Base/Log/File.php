@@ -14,6 +14,8 @@
  */
 namespace Lychee\Base\Log;
 
+use Lychee;
+
 /**
  * 文件日志类
  * @author Samding
@@ -45,12 +47,31 @@ class File
     private $log_dir;
 
     /**
+     * 实例
+     * @var File
+     */
+    private static $instance = null;
+
+    /**
      * 构造器
      * @param string $log_dir
      */
-    public function __construct($log_dir)
+    private function __construct($log_dir)
     {
         $this->log_dir = $log_dir;
+    }
+
+    /**
+     * 获取实例
+     * @return File
+     */
+    public static function getInstance()
+    {
+        if (!empty($config)) {
+            $log_dir = Lychee\Config::get('base.log.log_dir');
+            self::$instance = new File($log_dir);
+        }
+        return self::$instance;
     }
 
     /**

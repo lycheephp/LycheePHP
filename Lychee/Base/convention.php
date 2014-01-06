@@ -27,7 +27,13 @@ return array(
         'db_name' => 'lychee',
     ),
     //缓存配置
-    'cache' => array(),
+    'cache' => array(
+        'type' => 'file',
+        'cache_dir' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data',
+    ),
     //日志配置
-    'log' => array(),
+    'log' => array(
+        'type' => 'file',
+        'log_dir' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'log',
+    ),
 );

@@ -14,6 +14,8 @@
  */
 namespace Lychee\Base\DB;
 
+use Lychee;
+
 /**
  * MySQL数据库驱动
  * @author Samding
@@ -73,16 +75,16 @@ class Driver
 
     /**
      * 获取实例
-     * @param array $config
      * @return Driver
      */
-    public static function getInstance(array $config = array())
+    public static function getInstance()
     {
-        if (!empty($config)) {
-            $host = isset($config['host'])?$config['host']:'localhost';
-            $port = isset($config['port'])?$config['port']:3306;
-            $username = isset($config['username'])?$config['username']:'root';
-            $password = isset($config['password'])?$config['password']:'';
+        if (is_null(self::$instance)) {
+            //初始化Driver
+            $host = Lychee\Config::get('base.db.host');
+            $port = Lychee\Config::get('base.db.port');
+            $username = Lychee\Config::get('base.db.username');
+            $password = Lychee\Config::get('base.db.password');
             self::$instance = new Driver($host, $port, $username, $password);
         }
         return self::$instance;

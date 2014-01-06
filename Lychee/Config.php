@@ -102,6 +102,7 @@ class Config
         $result = null;
         for ($i = 0; $i < $len; $i++) {
             $key = $path[$i];
+            $key = strtolower($key);
             if ($i == 0) {
                 $result = isset(self::$data[$key])?self::$data[$key]:null;
             }

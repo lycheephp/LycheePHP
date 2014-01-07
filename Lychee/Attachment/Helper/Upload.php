@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Lychee\Attachment;
+namespace Lychee\Attachment\Helper;
 
 /**
  * 附件上传工具类

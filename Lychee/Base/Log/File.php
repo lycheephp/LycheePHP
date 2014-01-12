@@ -101,9 +101,9 @@ class File
         //写入信息
         $handle = fopen($log_path, 'a');
         flock($handle, LOCK_EX);
-        $lines[] = "|----------------------------------------------------------\r\n\r\n\r\n";
+        $lines[] = "|----------------------------------------------------------" . PHP_EOL . PHP_EOL . PHP_EOL;
         foreach ($lines as $line) {
-            $lines .= "\r\n";
+            $lines .= PHP_EOL;
             fwrite($handle, $line);
         }
         flock($handle, LOCK_UN);

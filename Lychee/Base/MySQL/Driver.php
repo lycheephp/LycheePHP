@@ -55,12 +55,6 @@ class Driver
     private $affected_rows = 0;
 
     /**
-     * driver instance
-     * @var Driver
-     */
-    private static $instance = null;
-
-    /**
      * constructor
      * @param string $host
      * @param int $port
@@ -68,30 +62,12 @@ class Driver
      * @param string $password
      * @param string $charset
      */
-    private function __construct($host, $port, $username, $password, $charset)
+    public function __construct($host, $port, $username, $password, $charset)
     {
         $this->pdo = null;
         $this->username = $username;
         $this->password = $password;
         $this->dsn = "mysql:host={$host};port={$port};charset={$charset}";
-    }
-
-    /**
-     * singleton
-     * @return Driver
-     */
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-            //initialize driver
-            $host = Lychee\Config::get('db.host');
-            $port = Lychee\Config::get('db.port');
-            $username = Lychee\Config::get('db.username');
-            $password = Lychee\Config::get('db.password');
-            $charset = Lychee\Config::get('db.charset');
-            self::$instance = new Driver($host, $port, $username, $password, $charset);
-        }
-        return self::$instance;
     }
 
     /**

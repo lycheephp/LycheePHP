@@ -14,6 +14,8 @@
  */
 namespace Lychee\Base\MySQL;
 
+use Lychee\Service as Service;
+
 /**
  * QueryHelper
  * @author Samding
@@ -101,7 +103,7 @@ class QueryHelper
      */
     public function __construct($db_name, $tbl_name)
     {
-        $this->driver = Driver::getInstance();
+        $this->driver = Service::get('mysql');
         $this->db_name = $db_name;
         $this->tbl_name = $tbl_name;
         $this->reset();

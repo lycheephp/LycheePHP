@@ -91,6 +91,7 @@ class Config
 
     /**
      * 获取配置值
+     * @throws \Exception
      * @param string $name 配置项
      * @param mixed $default 无此项目时返回该参数，默认为null
      * @return mixed

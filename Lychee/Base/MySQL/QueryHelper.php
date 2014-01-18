@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2013 henryzengpn koboshi
+ * Copyright 2013 koboshi(Samding)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,90 +12,90 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Lychee\Base\DB;
+namespace Lychee\Base\MySQL;
 
 /**
- * ActiveRecord实现
+ * QueryHelper
  * @author Samding
- * @package Lychee\Base\DB
+ * @package Lychee\Base\MySQL
  */
-class ActiveRecord
+class QueryHelper
 {
 
     /**
-     * 数据库适配器
+     * database driver
      * @var Driver
      */
     private $driver;
 
     /**
-     * 数据库名
+     * database name
      * @var string
      */
     protected $db_name;
 
     /**
-     * 表名
+     * table name
      * @var string
      */
     protected $tbl_name;
 
     /**
-     * SQL语句参数
+     * sql statement params
      * @var array
      */
     private $params;
 
     /**
-     * 数据
+     * data
      * @var array
      */
     private $data;
 
     /**
-     * where子句
+     * where condition
      * @var string
      */
     private $where_str;
 
     /**
-     * join子句
+     * join condition list
      * @var array
      */
-    private $join_str;
+    private $join_str_list;
 
     /**
-     * limit子句
+     * limit condition
      * @var string
      */
     private $limit_str;
 
     /**
-     * order子句
+     * order by condition
      * @var string
      */
     private $order_str;
 
     /**
-     * group子句
+     * group by condition
      * @var string
      */
     private $group_str;
 
     /**
-     * select 子句
+     * select condition
      * @var string
      */
     private $field_str;
 
     /**
-     * 最近一次sql语句
+     * last query(execute) sql
      * @var string
      */
     private $last_sql;
 
     /**
-     * 构造器
+     * constructor
      * @param string $db_name
      * @param string $tbl_name
      */
@@ -108,14 +108,14 @@ class ActiveRecord
     }
 
     /**
-     * 重置参数
+     * reset all condition
      */
     private function reset()
     {
         $this->params = array();
         $this->data = array();
         $this->where_str = '';
-        $this->join_str = array();
+        $this->join_str_list = array();
         $this->limit_str = '';
         $this->order_str = '';
         $this->group_str = '';
@@ -123,7 +123,7 @@ class ActiveRecord
     }
 
     /**
-     * 转义字符串
+     * escape string
      * @param string $str
      * @return string
      */
@@ -134,7 +134,7 @@ class ActiveRecord
     }
 
     /**
-     * 转义数组
+     * escape array element
      * @param array $data
      * @return array
      */
@@ -144,7 +144,7 @@ class ActiveRecord
     }
 
     /**
-     * 获取最后插入id值
+     * return last insert id
      * @throws \PDOException
      * @return int
      */
@@ -154,7 +154,7 @@ class ActiveRecord
     }
 
     /**
-     * 获取受影响行数
+     * return affected row
      * @return int
      */
     protected function getAffectRows()
@@ -163,7 +163,7 @@ class ActiveRecord
     }
 
     /**
-     * 获取from子句
+     * return from conditon (`database_a`.`tbl_b`)
      * @return string
      */
     private function getFromStr()
@@ -176,7 +176,8 @@ class ActiveRecord
     }
 
     /**
-     * 设置参数值
+     * separate data to param
+     * array('field' => 'value') ---> array('field' => ':field'), array(':field' => 'value')
      * @param array $data
      * @return array
      */
@@ -197,8 +198,8 @@ class ActiveRecord
     }
 
     /**
-     * 获取数据设置子句
-     * 关联数组转换成xxx=xxx, yyy=yyy的sql语句形式
+     * return data setting condition
+     * array('field' => 'value') --->  "`field` = 'value'"
      * @param array $data
      * @return string
      */
@@ -220,8 +221,7 @@ class ActiveRecord
     }
 
     /**
-     * 执行sql查询
-     * 返回查询数据
+     * query sql and return result set (assoc array)
      * @param string $sql
      * @param array $params
      * @throws \PDOException
@@ -236,8 +236,7 @@ class ActiveRecord
     }
 
     /**
-     * 执行sql
-     * 返回影响行数
+     * execute sql and return affected row count
      * @param string $sql
      * @param array $params
      * @throws \PDOException
@@ -252,7 +251,7 @@ class ActiveRecord
     }
 
     /**
-     * 开始事务
+     * start transaction
      * @return bool
      */
     public function begin()
@@ -261,7 +260,7 @@ class ActiveRecord
     }
 
     /**
-     * 提交事务
+     * commit transaction
      * @return bool
      */
     public function commit()
@@ -270,14 +269,14 @@ class ActiveRecord
     }
 
     /**
-     * 查询总数
+     * return result set count
      * @throws \PDOException
      * @return int
      */
     public function count()
     {
         $this->field('count(*) AS count', false);
-        $list = $this->selectRow();
+        $list = $this->__select();
         $result = 0;
         if (count($list) == 1) {
             $result = intval($list[0]['count']);
@@ -292,10 +291,10 @@ class ActiveRecord
     }
 
     /**
-     * 设置数据
+     * set insert(update) data
      * @param array $data
      * @throws \PDOException
-     * @return ActiveRecord
+     * @return QueryHelper
      */
     public function data(array $data)
     {
@@ -309,7 +308,7 @@ class ActiveRecord
     }
 
     /**
-     * 删除记录
+     * delete record
      * @throws \PDOException
      * @return int
      */
@@ -328,10 +327,10 @@ class ActiveRecord
     }
 
     /**
-     * 设置查询字段
+     * set result set column
      * @param array|string $field
      * @param bool $secure
-     * @return ActiveRecord
+     * @return QueryHelper
      */
     public function field($field, $secure = true)
     {
@@ -339,10 +338,23 @@ class ActiveRecord
             $this->field_str = '*';
             return $this;
         }
+        $output = array();
+        $func = function ($value) use (&$output)
+        {
+            $value = $this->escapeString($value);
+            $output[] = "`{$value}`";
+        };
         if (is_array($field)) {
             $output = array();
             foreach ($field as $item) {
                 if ($secure) {
+                    // db.tbl.column -> `db`.`tbl`.`column`
+                    if (strpos($item, '.')) {
+                        $temp = explode('.', $item);
+                        $output = array();
+                        array_walk($temp, $func);
+                        $item = implode('.', $output);
+                    }
                     $item = $this->escapeString($item);
                     $output[] = "`{$item}`";
                 }
@@ -362,7 +374,7 @@ class ActiveRecord
     }
 
     /**
-     * 获取数据库名称
+     * return current database name
      * @return string
      */
     public function getDBName()
@@ -371,7 +383,7 @@ class ActiveRecord
     }
 
     /**
-     * 获取最近一次执行的SQL
+     * return last query(execute) sql
      * @return string
      */
     public function getLastSQL()
@@ -380,7 +392,7 @@ class ActiveRecord
     }
 
     /**
-     * 获取表名
+     * return current table name
      * @return string
      */
     public function getTblName()
@@ -389,11 +401,11 @@ class ActiveRecord
     }
 
     /**
-     * 分组
-     * 例子1:group('id') //GROUP BY id
-     * 例子2:group(array('id', 'name')) //GROUP BY id, name
+     * set group by condition
+     * e.g.1:group('id') //GROUP BY id
+     * e.g.2:group(array('id', 'name')) //GROUP BY id, name
      * @param array|string $field
-     * @return ActiveRecord
+     * @return QueryHelper
      */
     public function group($field)
     {
@@ -416,7 +428,7 @@ class ActiveRecord
     }
 
     /**
-     * 插入记录
+     * insert record
      * @throws \PDOException
      * @return int
      */
@@ -435,59 +447,48 @@ class ActiveRecord
     }
 
     /**
-     * 连接表
-     * 例子1: join('id' => 'tbl_b', 'id') // INNER JOIN tbl_b ON tbl_b.id = id
-     * 例子2: join('id' => 'tbl_b', 'id' => 'tbl_c', self::LEFT_JOIN) // LEFT JOIN tbl_b ON tbl_b.id = tbl_c.id
+     * set join condition
+     * e.g.1: join('tbl_c', array('tbl_a.id', 'tbl_c.id')) // INNER JOIN tbl_c ON tbl_a.id = tbl_c.id
+     * e.g.2: join(array('tbl_c', array('tbl_a.id', 'tbl_c.id'), Operator::JOIN_LEFT) // LEFT JOIN tbl_c ON tbl_a.id = tbl_c.id
+     * @param string $tbl_name
      * @param array $condition
-     * @param string $type 链接类型
-     * @return ActiveRecord
+     * @param string $type
+     * @return QueryHelper
      */
-    public function join(array $condition, $type = Operator::JOIN_INNTER)
+    public function join($tbl_name, array $condition, $type = Operator::JOIN_INNTER)
     {
-        if (empty($condition)) {
-            return $this;
-        }
-        //获取要链接的表名
-        $target_str = '';
-        foreach ($condition as $value) {
-            $target_str = $this->escapeString($value);
-            break;
-        }
-        if (strpos($target_str, '.') !== false) {
-            $target_str = preg_replace("/^(.*?)\.(.*?)$/is", "`$1`.`$2`", $target_str);
-        }
-        else {
-            $target_str = "`{$target_str}`";
-        }
-        //获取链接条件
-        $on_str = array();
-        $callback = function ($value, $key) use (&$on_str, &$target_str)
+        $output = array();
+        $func = function ($value) use (&$output)
         {
-            if (is_int($key)) {
-                $value = $this->escapeString($value);
-                $on_str[] = "`$target_str`.`{$value}`";
-            }
-            else {
-                $value = $this->escapeString($value);
-                $key = $this->escapeString($key);
-                $on_str[] = "`{$value}`.`{$key}`";
-            }
+            $value = $this->escapeString($value);
+            $output[] = "`{$value}`";
         };
-        array_walk($condition, $callback);
-        $on_str = implode(' = ', $on_str);
+        $temp = explode('.', $tbl_name);
+        $output = array();
+        array_walk($temp, $func);
+        $tbl_name = implode('.', $output);
+        $target_str = $tbl_name;
+        $on_str_list = array();
+        foreach ($condition as $item) {
+            $temp = explode('.', $item);
+            $output = array();
+            array_walk($temp, $func);
+            $on_str_list[] = implode('.', $output);
+        }
         $type = ltrim($type, '$');
-        $result = "{$type} {$target_str} ON {$on_str}";
-        $this->join_str[] = $result;
+        $on_str = implode(' = ', $on_str_list);
+        $join_str = "{$type} {$target_str} ON {$on_str}";
+        $this->join_str_list[] = $join_str;
         return $this;
     }
 
     /**
-     * 设置limit条件
-     * 例子1: limit(1) //LIMIT 1
-     * 例子2: limit(1, 2) //LIMIT 2, 1(OFFSET 2 LIMIT 1)
+     * set limit and offset
+     * e.g.1: limit(1) //LIMIT 1
+     * e.g.2: limit(1, 2) //LIMIT 2, 1(OFFSET 2 LIMIT 1)
      * @param int $limit
      * @param int $offset
-     * @return ActiveRecord
+     * @return QueryHelper
      */
     public function limit($limit, $offset = 0)
     {
@@ -498,7 +499,7 @@ class ActiveRecord
     }
 
     /**
-     * 查询最大值
+     * return result set specify column max value
      * @param string $field
      * @throws \PDOException
      * @return int|array
@@ -506,7 +507,7 @@ class ActiveRecord
     public function max($field)
     {
         $this->field("MAX(`{$field}``) AS max", false);
-        $list = $this->selectRow();
+        $list = $this->__select();
         $result = 0;
         if (count($list) == 1) {
             $result = intval($list[0]['max']);
@@ -521,7 +522,7 @@ class ActiveRecord
     }
 
     /**
-     * 查询最小值
+     * return result set specify column min value
      * @param string $field
      * @throws \PDOException
      * @return int|array
@@ -529,7 +530,7 @@ class ActiveRecord
     public function min($field)
     {
         $this->field("min({$field}) AS min", false);
-        $list = $this->selectRow();
+        $list = $this->__select();
         $result = 0;
         if (count($list) == 1) {
             $result = intval($list[0]['min']);
@@ -544,13 +545,13 @@ class ActiveRecord
     }
 
     /**
-     * 排序
-     * 例子1:order('id') //ORDER BY id DESC
-     * 例子2:order('id', Operator::SORT_ASC)//ORDER BY id ASC
-     * 例子3:order(array('add_time', 'id'))//ORDER BY add_time, id DESC
+     * set sorting(order by) condition
+     * e.g.1:order('id') //ORDER BY id DESC
+     * e.g.2:order('id', Operator::SORT_ASC)//ORDER BY id ASC
+     * e.g.3:order(array('add_time', 'id'))//ORDER BY add_time, id DESC
      * @param string|array $field
      * @param Operator|string $direction
-     * @return ActiveRecord
+     * @return QueryHelper
      */
     public function order($field, $direction = Operator::SORT_DESC)
     {
@@ -576,7 +577,7 @@ class ActiveRecord
     }
 
     /**
-     * 回滚事务
+     * rollback transaction
      * @throws \PDOException
      * @return bool
      */
@@ -586,19 +587,19 @@ class ActiveRecord
     }
 
     /**
-     * 查询行
+     * select and return result set (assoc)
      * @throws \PDOException
      * @return array
      */
-    private function selectRow() {
+    private function __select() {
         $from_str = $this->getFromStr();
         $field = $this->field_str;
         if (empty($field)) {
             $field = '*';
         }
         $sql = "SELECT {$field} FROM {$from_str}";
-        if (!empty($this->join_str)) {
-            $temp = implode(' ', $this->join_str);
+        if (!empty($this->join_str_list)) {
+            $temp = implode(' ', $this->join_str_list);
             $sql .= " {$temp}";
         }
         if (!empty($this->where_str)) {
@@ -618,7 +619,7 @@ class ActiveRecord
     }
 
     /**
-     * 查询数据
+     * return result set (assoc)
      * @param bool $single
      * @throws \PDOException
      * @return array
@@ -628,7 +629,7 @@ class ActiveRecord
         if ($single) {
             $this->limit(1);
         }
-        $list = $this->selectRow();
+        $list = $this->__select();
         if ($single) {
             return isset($list[0])?$list[0]:array();
         }
@@ -636,29 +637,7 @@ class ActiveRecord
     }
 
     /**
-     * 设置数据库
-     * @param string $name
-     * @return ActiveRecord
-     */
-    public function setDBName($name)
-    {
-        $this->db_name = trim($name);
-        return $this;
-    }
-
-    /**
-     * 设置表名
-     * @param string $name
-     * @return ActiveRecord
-     */
-    public function setTblName($name)
-    {
-        $this->tbl_name = trim($name);
-        return $this;
-    }
-
-    /**
-     * 更新数据
+     * update record
      * @throws \PDOException
      * @return int
      */
@@ -680,7 +659,7 @@ class ActiveRecord
     }
 
     /**
-     * 构建where条件子句片段
+     * build where condition fragment
      * @param $field
      * @param array $condition
      * @return string
@@ -720,7 +699,7 @@ class ActiveRecord
     }
 
     /**
-     * 构建where条件子句
+     * build where condition
      * @param array $condition
      * @param string|Operator $type
      * @return string
@@ -759,14 +738,14 @@ class ActiveRecord
     }
 
     /**
-     * 设置where条件
-     * 例子1: where(array('id' => 1)) //WHERE id = 1
-     * 例子2: where(array('name' => 'koboshi', 'id' => 2)) //WHERE id = 2 AND name = 'koboshi'
-     * 例子3: where(array('age' => array(Operator::BETWEEN = > array('3', '4')))) //WHERE age BETWWEN 3 AND 4
-     * 例子4: where(array('age' => array(Operator::BETWEEN = > array('3', '4')), 'name' => array(Operator::IN => array('a', 'b', 'c')))) //WHERE age BETWWEN 3 AND 4 AND name IN ('a', 'b', 'c')
-     * 例子5: where(array(Operator::QUERY_OR => array('status' => 1, 'name' => 2), 'id' => 3)) //WHERE (status = 1 OR name = 2) AND id = 3
+     * set where condition
+     * e.g.1: where(array('id' => 1)) //WHERE id = 1
+     * e.g.2: where(array('name' => 'koboshi', 'id' => 2)) //WHERE id = 2 AND name = 'koboshi'
+     * e.g.3: where(array('age' => array(Operator::BETWEEN = > array('3', '4')))) //WHERE age BETWWEN 3 AND 4
+     * e.g.4: where(array('age' => array(Operator::BETWEEN = > array('3', '4')), 'name' => array(Operator::IN => array('a', 'b', 'c')))) //WHERE age BETWWEN 3 AND 4 AND name IN ('a', 'b', 'c')
+     * e.g.5: where(array(Operator::QUERY_OR => array('status' => 1, 'name' => 2), 'id' => 3)) //WHERE (status = 1 OR name = 2) AND id = 3
      * @param array $condition
-     * @return ActiveRecord
+     * @return QueryHelper
      */
     public function where(array $condition)
     {

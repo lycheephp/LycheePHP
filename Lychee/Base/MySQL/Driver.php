@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2013 henryzengpn koboshi
+ * Copyright 2013 koboshi(Samding)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,86 +12,90 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Lychee\Base\DB;
+namespace Lychee\Base\MySQL;
 
 use Lychee;
 
 /**
- * MySQL数据库驱动
+ * MySQL Database Driver
  * @author Samding
- * @package Lychee\Base\DB
+ * @package Lychee\Base\MySQL
  */
 class Driver
 {
 
     /**
-     * 连接字符串
+     * Data Source Name
      * @var string
      */
     private $dsn;
 
     /**
-     * 用户名
+     * username
      * @var string
      */
     private $username;
 
     /**
-     * 密码
+     * password
      * @var string
      */
     private $password;
 
     /**
-     * PDO对象
+     * PDO instance
      * @var \PDO
      */
     private $pdo;
 
     /**
-     * 受影响行数
+     * affected row count
      * @var int
      */
     private $affected_rows = 0;
 
     /**
-     * 实例
+     * driver instance
      * @var Driver
      */
     private static $instance = null;
 
     /**
-     * 构造器
-     * @param $host
-     * @param $port
-     * @param $username
-     * @param $password
+     * constructor
+     * @param string $host
+     * @param int $port
+     * @param string $username
+     * @param string $password
+     * @param string $charset
      */
-    private function __construct($host, $port, $username, $password)
+    private function __construct($host, $port, $username, $password, $charset)
     {
         $this->pdo = null;
-        $this->dsn = "mysql:host={$host};port={$port}";
+        $this->username = $username;
+        $this->password = $password;
+        $this->dsn = "mysql:host={$host};port={$port};charset={$charset}";
     }
 
     /**
-     * 获取实例
+     * singleton
      * @return Driver
      */
     public static function getInstance()
     {
         if (is_null(self::$instance)) {
-            //初始化Driver
-            $host = Lychee\Config::get('base.db.host');
-            $port = Lychee\Config::get('base.db.port');
-            $username = Lychee\Config::get('base.db.username');
-            $password = Lychee\Config::get('base.db.password');
-            self::$instance = new Driver($host, $port, $username, $password);
+            //initialize driver
+            $host = Lychee\Config::get('db.host');
+            $port = Lychee\Config::get('db.port');
+            $username = Lychee\Config::get('db.username');
+            $password = Lychee\Config::get('db.password');
+            $charset = Lychee\Config::get('db.charset');
+            self::$instance = new Driver($host, $port, $username, $password, $charset);
         }
         return self::$instance;
     }
 
     /**
-     * 发起数据库连接
+     * initialize connection
      * @throws \PDOException
      * @param bool $force 为真时强制发起新连接
      */
@@ -102,11 +106,12 @@ class Driver
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
             $this->pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, true);
+            $this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
         }
     }
 
     /**
-     * 开始事务
+     * start transaction
      * @throws \PDOException
      * @return bool
      */
@@ -117,7 +122,7 @@ class Driver
     }
 
     /**
-     * 提交事务
+     * commit transaction
      * @throws \PDOException
      * @return bool
      */
@@ -128,7 +133,7 @@ class Driver
     }
 
     /**
-     * 回滚事务
+     * rollback transaction
      * @throws \PDOException
      * @return bool
      */
@@ -139,17 +144,30 @@ class Driver
     }
 
     /**
-     * 字符串转义
+     * escape string
      * @param string $str
      * @return string
      */
     public function escapeString($str)
     {
-        return addslashes($str);
+        $this->connect();
+        if (is_null($str)) {
+            $result = $this->pdo->quote($str, \PDO::PARAM_NULL);
+        }
+        elseif (is_numeric($str) && $str < PHP_INT_MAX) {
+            $result = $this->pdo->quote($str, \PDO::PARAM_INT);
+        }
+        elseif (is_bool($str)) {
+            $result = $this->pdo->quote($str, \PDO::PARAM_BOOL);
+        }
+        else {
+            $result = $this->pdo->quote($str, \PDO::PARAM_STR);
+        }
+        return $result;
     }
 
     /**
-     * 数组转义
+     * escape array element
      * @param array $array
      * @return array
      */
@@ -171,7 +189,7 @@ class Driver
     }
 
     /**
-     * 获取最后一次查询的受影响行数
+     * return affected row count
      * @return int
      */
     public function getAffectedRows()
@@ -180,7 +198,7 @@ class Driver
     }
 
     /**
-     * 获取最后一次插入自增ID
+     * return last insert id
      * @throws \PDOException
      * @return int
      */
@@ -191,21 +209,20 @@ class Driver
     }
 
     /**
-     * 为SQL语句绑定参数
+     * bind params to sql statement
      * @param \PDOStatement $statement
      * @param array $params
      * @throws \PDOException
      */
     private function bindParams(\PDOStatement $statement, array $params)
     {
-        foreach ($params as $key => $value) {
-            //判断数组是普通数组还是关联数组
+        foreach ($params as $key => &$value) {
             if (is_int($key)) {
-                //普通数组
+                //array
                 if (is_null($value)) {
                     $statement->bindValue($key+1, null, \PDO::PARAM_NULL);
                 }
-                elseif ($value < PHP_INT_MAX) {
+                elseif (is_numeric($value) && $value < PHP_INT_MAX) {
                     $statement->bindParam($key+1, $value, \PDO::PARAM_INT);
                 }
                 else {
@@ -213,11 +230,11 @@ class Driver
                 }
             }
             else {
-                //关联数组
+                //assoc array
                 if (is_null($value)) {
                     $statement->bindValue($key, null, \PDO::PARAM_NULL);
                 }
-                elseif ($value < PHP_INT_MAX) {
+                elseif (is_numeric($value) && $value < PHP_INT_MAX) {
                     $statement->bindParam($key, $value, \PDO::PARAM_INT);
                 }
                 else {
@@ -228,9 +245,9 @@ class Driver
     }
 
     /**
-     * 执行查询
+     * query sql and return result set(assoc array)
      * @param $sql
-     * @param array $params sql语句中要绑定的参数
+     * @param array $params
      * @throws \PDOException
      * @return array
      */
@@ -239,7 +256,6 @@ class Driver
         $this->connect();
         try {
             $statement = $this->pdo->prepare($sql);
-            //绑定sql语句参数
             if (!empty($params)) {
                 $this->bindParams($statement, $params);
             }
@@ -261,7 +277,7 @@ class Driver
     }
 
     /**
-     * 执行SQL语句返回受影响行数
+     * execute sql and return affected row count
      * @param $sql
      * @param array $params
      * @throws \PDOException
@@ -274,16 +290,17 @@ class Driver
     }
 
     /**
-     * 关闭数据库连接
+     * close connection
      */
     public function close()
     {
-        $this->connect();
-        unset($this->pdo);
+        if (!is_null($this->pdo)) {
+            unset($this->pdo);
+        }
     }
 
     /**
-     * 析构器
+     * destructor
      */
     public function __destruct()
     {

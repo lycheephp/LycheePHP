@@ -97,6 +97,9 @@ class Config
      */
     public static function get($name, $default = null)
     {
+        if (!self::$is_load) {
+            throw new \Exception("pls call " . __CLASS__ . "::load first.");
+        }
         $path = explode('.', $name);
         $len = count($path);
         $result = null;

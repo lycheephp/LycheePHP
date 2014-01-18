@@ -14,6 +14,7 @@
  */
 namespace Lychee\Base\MySQL;
 
+use Lychee\Config;
 use Lychee\Service as Service;
 
 /**
@@ -101,9 +102,12 @@ class QueryHelper
      * @param string $db_name
      * @param string $tbl_name
      */
-    public function __construct($db_name, $tbl_name)
+    public function __construct($tbl_name, $db_name='')
     {
         $this->driver = Service::get('mysql');
+        if (empty($db_name)) {
+            $db_name = Config::get('base.mysql.db_name');
+        }
         $this->db_name = $db_name;
         $this->tbl_name = $tbl_name;
         $this->reset();

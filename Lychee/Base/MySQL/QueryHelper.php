@@ -665,6 +665,38 @@ class QueryHelper
     }
 
     /**
+     * increase specific field value
+     * @param string $field
+     * @param int $offset
+     * @return int
+     */
+    public function increment($field, $offset=1)
+    {
+        $offset = intval($offset);
+        if ($offset == 0) {
+            return 0;
+        }
+        $from_str = $this->getFromStr();
+        $sql = "UPDATE {$from_str} SET `{$field}` = `$field` + {$offset} WHERE {$this->where_str}";
+        if (!empty($this->limit_str)) {
+            $sql .= " LIMIT {$this->limit_str}";
+        }
+        $result = $this->execute($sql);
+        return $result;
+    }
+
+    /**
+     * decrease specific field value
+     * @param $field
+     * @param int $offset
+     * @return int
+     */
+    public function decrement($field, $offset=1)
+    {
+        return $this->increment($field, $offset * -1);
+    }
+
+    /**
      * build where condition fragment
      * @param $field
      * @param array $condition

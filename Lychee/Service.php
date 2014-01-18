@@ -75,11 +75,11 @@ class Service
      */
     private static function initMySQL()
     {
-        $host = Config::get('base.db.host');
-        $port = Config::get('base.db.port');
-        $username = Config::get('base.db.username');
-        $password = Config::get('base.db.password');
-        $charset = Config::get('base.db.charset');
+        $host = Config::get('base.mysql.host');
+        $port = Config::get('base.mysql.port');
+        $username = Config::get('base.mysql.username');
+        $password = Config::get('base.mysql.password');
+        $charset = Config::get('base.mysql.charset');
         self::$container['mysql'] = new MySQLDriver($host, $port, $username, $password, $charset);
     }
 }

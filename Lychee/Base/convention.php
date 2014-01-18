@@ -18,22 +18,15 @@
  */
 return array(
     //数据库配置
-    'db' => array(
-        'type' => 'mysql',
+    'mysql' => array(
         'host' => '127.0.0.1',
         'port' => 3306,
         'username' => 'root',
-        'password' =>  '123456',
+        'password' =>  'password',
         'db_name' => 'lychee',
     ),
-    //缓存配置
-    'cache' => array(
-        'type' => 'file',
-        'cache_dir' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data',
-    ),
     //日志配置
-    'log' => array(
-        'type' => 'file',
+    'logger' => array(
         'log_dir' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'log',
     ),
 );

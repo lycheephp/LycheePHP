@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2013 henryzengpn koboshi
+ * Copyright 2013 koboshi(Samding)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,36 +12,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Lychee\Base\DB;
+namespace Lychee\Base\MySQL;
 
 /**
- * 数据库运算符
+ * Mysql query operator
  * @author Samding
- * @package Lychee\Base\DB
+ * @package Lychee\Base\MySQL
  */
 class Operator
 {
 
     /**
-     * 大于
+     * greater than
      * @var string
      */
     const QUERY_GT = '$>';
 
     /**
-     * 大于等于
+     * greater than equal
      * @var string
      */
     const QUERY_GTE = '$>=';
 
     /**
-     * 小于
+     * less than
      * @var string
      */
     const QUERY_LT = '$<';
 
     /**
-     * 小于等于
+     * less than equal
      * @var string
      */
     const QUERY_LTE = '$<=';
@@ -53,79 +53,79 @@ class Operator
     const QUERY_IN = '$IN';
 
     /**
-     * NOT IN操作
+     * NOT IN
      * @var string
      */
     const QUERY_NOT_IN = '$NOT IN';
 
     /**
-     * 等于
+     * equal
      * @var string
      */
     const QUERY_EQUAL = '$=';
 
     /**
-     * 搜索
+     * like
      * @var string
      */
     const QUERY_LIKE = '$like';
 
     /**
-     * 不等于
+     * not equal
      * @var string
      */
     const QUERY_NE = '$!=';
 
     /**
-     * AND
+     * and
      * @var string
      */
     const QUERY_AND = '$AND';
 
     /**
-     * OR
+     * or
      * @var string
      */
     const QUERY_OR = '$OR';
 
     /**
-     * betwwen
+     * between
      * @var string
      */
     const QUERY_BETWEEN = '$BETWEEN';
 
     /**
-     * 升序排序
+     * ascending
      * @var string
      */
     const SORT_ASC = '$ASC';
 
     /**
-     * 降序排序
+     * descending
      * @var string
      */
     const SORT_DESC = '$DESC';
 
     /**
-     * 内链接表
+     * inner join
      * @var string
      */
     const JOIN_INNTER = '$INNER JOIN';
 
     /**
-     * 外连接表
+     * outter join
      * @var string
      */
     const JOIN_OUTTER = '$OUTTER JOIN';
 
     /**
-     * 左连接表
+     * left join
      * @var string
      */
     const JOIN_LEFT = '$LEFT JOIN';
 
     /**
-     * 右连接表
+     * right join
      * @var string
      */
     const JOIN_RIGHT = '$RIGHT JOIN';

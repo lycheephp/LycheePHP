@@ -12,16 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Lychee\Base\Log;
+namespace Lychee\Base;
 
 use Lychee;
 
 /**
- * 文件日志类
+ * logger
  * @author Samding
  * @package Lychee\Base\Log
  */
-class File
+class Logger
 {
 
     const EMERGENCY = 'emergency';
@@ -40,6 +40,8 @@ class File
 
     const DEBUG = 'debug';
 
+    private static $log_delimiter = "|----------------------------------------------------------";
+
     /**
      * 日志路径
      * @var string
@@ -47,31 +49,12 @@ class File
     private $log_dir;
 
     /**
-     * 实例
-     * @var File
-     */
-    private static $instance = null;
-
-    /**
      * 构造器
      * @param string $log_dir
      */
-    private function __construct($log_dir)
+    public function __construct($log_dir)
     {
         $this->log_dir = $log_dir;
-    }
-
-    /**
-     * 获取实例
-     * @return File
-     */
-    public static function getInstance()
-    {
-        if (!empty($config)) {
-            $log_dir = Lychee\Config::get('base.log.log_dir');
-            self::$instance = new File($log_dir);
-        }
-        return self::$instance;
     }
 
     /**
@@ -101,7 +84,7 @@ class File
         //写入信息
         $handle = fopen($log_path, 'a');
         flock($handle, LOCK_EX);
-        $lines[] = "|----------------------------------------------------------" . PHP_EOL . PHP_EOL . PHP_EOL;
+        $lines[] = self::$log_delimiter . PHP_EOL . PHP_EOL . PHP_EOL;
         foreach ($lines as $line) {
             $lines .= PHP_EOL;
             fwrite($handle, $line);
@@ -276,7 +259,7 @@ class File
         $lines[] = "COOKIE:" . $this->getCookieStr();
         $lines[] = "MESSAGE:" . $message;
         if (!empty($context)) {
-            $lines[] = "Context:" . $this->getContextStr($context);
+            $lines[] = "CONTEXT:" . $this->getContextStr($context);
         }
         $log_path = $this->getLogFilePath($level);
         $this->write($log_path, $lines);

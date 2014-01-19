@@ -14,6 +14,7 @@
  */
 namespace Lychee\Archive;
 
+use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
 
 /**
@@ -41,8 +42,8 @@ class Archive
      */
     public function __construct()
     {
-        $this->archive = new QueryHelper('archive');
-        $this->category = new QueryHelper('archive_category');
+        $this->archive = new QueryHelper('archive', Config::get('archive.mysql.db_name'));
+        $this->category = new QueryHelper('archive_category', Config::get('archive.mysql.db_name'));
     }
 
     /**

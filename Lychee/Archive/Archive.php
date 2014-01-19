@@ -87,7 +87,7 @@ class Archive
         if ($id < 1) {
             return 0;
         }
-        return $this->category->where(array('archive_id' => $id))->data($data)->update();
+        return $this->category->where(array('cate_id' => $id))->data($data)->update();
     }
 
     /**
@@ -115,7 +115,34 @@ class Archive
         if ($id < 1) {
             return 0;
         }
-        return $this->category->where(array('archive_id' => $id))->delete();
+        return $this->category->where(array('cate_id' => $id))->delete();
     }
 
+    /**
+     * 增加文章点击数
+     * @param int $id
+     * @return int
+     */
+    public function increaseClick($id)
+    {
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->archive->where(array('archive_id' => $id))->increment('click', 1);
+    }
+
+    /**
+     * 减少文章点击数
+     * @param int $id
+     * @return int
+     */
+    public function decreaseClick($id)
+    {
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->archive->where(array('archive_id' => $id))->decrement('click', 1);
+    }
 }

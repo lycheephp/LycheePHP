@@ -120,7 +120,7 @@ class QueryHelper
     {
         $this->params = array();
         $this->data = array();
-        $this->where_str = '';
+        $this->where_str = '1 = 1';
         $this->join_str_list = array();
         $this->limit_str = '';
         $this->order_str = '';

@@ -145,4 +145,82 @@ class Archive
         }
         return $this->archive->where(array('archive_id' => $id))->decrement('click', 1);
     }
+
+    /**
+     * 获取文章信息
+     * @param int $id
+     * @return array
+     */
+    public function getArchiveInfo($id)
+    {
+        $id = intval($id);
+        if ($id < 1) {
+            return array();
+        }
+        return $this->archive->where(array('archive_id' => $id, 'status' => 1))->select(true);
+    }
+
+    /**
+     * 根据文章分类获取文章列表
+     * @param $cate_id
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    public function getArchiveListByCategory($cate_id, $offset, $limit)
+    {
+        $offset = intval($offset);
+        $limit = intval($limit);
+        if ($limit < 1) {
+            return array();
+        }
+        if ($offset < 0) {
+            return array();
+        }
+        return $this->archive->where(array('status' => 1, 'cate_id' => $cate_id))->limit($limit, $offset)
+            ->order(array('sort', 'click', 'update_time', 'add_time'))->select();
+    }
+
+    /**
+     * 获取文章分类信息
+     * @param int $id
+     * @return array
+     */
+    public function getCategoryInfo($id)
+    {
+        $id = intval($id);
+        if ($id < 1) {
+            return array();
+        }
+        return $this->archive->where(array('cate_id' => $id))->select(true);
+    }
+
+    /**
+     * 整理文章分类树
+     * @param int $parent_id
+     * @param array $list
+     * @return array
+     */
+    private function arrangeCategoryTree($parent_id, array $list)
+    {
+        $result = array();
+        foreach ($list as $info) {
+            $temp = $info;
+            if ($info['parent_id'] == $parent_id) {
+                $temp['children'] = $this->arrangeCategoryTree($temp['cate_id'], $list);
+                $result[] = $temp;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 以树状图方式取出文章分类
+     * return array
+     */
+    public function getCategoryTree()
+    {
+        $list = $this->archive->order('sort')->select();
+        return $this->arrangeCategoryTree(0, $list);
+    }
 }

@@ -144,4 +144,55 @@ class Attachment
     {
 
     }
+
+    /**
+     * 开始下载文件
+     * @param int $id
+     */
+    public function download($id)
+    {
+
+    }
+
+    /**
+     * 获取指定相册信息
+     * @param int $id
+     * @return array
+     */
+    public function getAlbumnInfo($id)
+    {
+
+    }
+
+    /**
+     * 获取文件信息
+     * @param int $id
+     * @return array
+     */
+    public function getFileInfo($id)
+    {
+
+    }
+
+    /**
+     * 获取图片信息
+     * @param int $id
+     * @return array
+     */
+    public function getImageInfo($id)
+    {
+
+    }
+
+    /**
+     * 获取指定相册图片列表
+     * @param int $id
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    public function getAlbumnImageList($id, $offset, $limit)
+    {
+
+    }
 }

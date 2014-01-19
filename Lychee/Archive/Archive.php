@@ -16,6 +16,11 @@ namespace Lychee\Archive;
 
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
 
+/**
+ * 文章模块逻辑类
+ * @author Samding
+ * @package Lychee\Archive
+ */
 class Archive
 {
 

@@ -24,4 +24,124 @@ use Lychee\Base\MySQL\QueryHelper as QueryHelper;
 class Attachment
 {
 
+    /**
+     * 图片相册表查询类
+     * @var QueryHelper
+     */
+    private $image_albumn;
+
+    /**
+     * 文件表查询类
+     * @var QueryHelper
+     */
+    private $file;
+
+    /**
+     * 图片表查询类
+     * @var QueryHelper
+     */
+    private $image;
+
+    /**
+     * 构造器
+     */
+    public function __construct()
+    {
+        $this->image_albumn = new QueryHelper('attachment_image_albumn');
+        $this->image = new QueryHelper('attachment_image');
+        $this->file = new QueryHelper('attachment_file');
+    }
+
+    /**
+     * 添加图片相册
+     * @param array $data
+     * @return int
+     */
+    public function addAlbumn(array $data)
+    {
+
+    }
+
+    /**
+     * 编辑图片相册
+     * @param array $data
+     * @param int $id
+     * @return int
+     */
+    public function editAlbumn(array $data, $id)
+    {
+
+    }
+
+    /**
+     * 移除相册
+     * @param int $id
+     * @return int
+     */
+    public function removeAlbumn($id)
+    {
+
+    }
+
+    /**
+     * 添加图片
+     * @param array $data
+     * @return int
+     */
+    public function addImage(array $data)
+    {
+
+    }
+
+    /**
+     * 编辑图片
+     * @param array $data
+     * @param int $id
+     * @return int
+     */
+    public function editImage(array $data, $id)
+    {
+
+    }
+
+    /**
+     * 移除图片
+     * @param int $id
+     * @return int
+     */
+    public function removeImage($id)
+    {
+
+    }
+
+    /**
+     * 添加文件
+     * @param array $data
+     * @return int
+     */
+    public function addFile(array $data)
+    {
+
+    }
+
+    /**
+     * 编辑文件
+     * @param array $data
+     * @param int $id
+     * @return int
+     */
+    public function editFile(array $data, $id)
+    {
+
+    }
+
+    /**
+     * 移除文件
+     * @param int $id
+     * @return int
+     */
+    public function removeFile($id)
+    {
+
+    }
 }

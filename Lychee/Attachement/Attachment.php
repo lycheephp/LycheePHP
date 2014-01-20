@@ -14,6 +14,7 @@
  */
 namespace Lychee\Attachment;
 
+use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
 
 /**
@@ -47,9 +48,10 @@ class Attachment
      */
     public function __construct()
     {
-        $this->image_albumn = new QueryHelper('attachment_image_albumn');
-        $this->image = new QueryHelper('attachment_image');
-        $this->file = new QueryHelper('attachment_file');
+        $db_name = Config::get('attachment.mysql.db_name');
+        $this->image_albumn = new QueryHelper('attachment_image_albumn', $db_name);
+        $this->image = new QueryHelper('attachment_image', $db_name);
+        $this->file = new QueryHelper('attachment_file', $db_name);
     }
 
     /**

@@ -42,8 +42,9 @@ class Archive
      */
     public function __construct()
     {
-        $this->archive = new QueryHelper('archive', Config::get('archive.mysql.db_name'));
-        $this->category = new QueryHelper('archive_category', Config::get('archive.mysql.db_name'));
+        $db_name = Config::get('archive.mysql.db_name');
+        $this->archive = new QueryHelper('archive', $db_name);
+        $this->category = new QueryHelper('archive_category', $db_name);
     }
 
     /**

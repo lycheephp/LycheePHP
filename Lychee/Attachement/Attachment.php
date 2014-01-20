@@ -88,7 +88,7 @@ class Attachment
         if ($id < 1) {
             return 0;
         }
-        return $this->image_albumn->where(array('albumn_id' => $id))->delete();
+        return $this->image_albumn->data(array('status' => 0))->where(array('albumn_id' => $id))->update();
     }
 
     /**
@@ -127,7 +127,7 @@ class Attachment
         if ($id < 1) {
             return 0;
         }
-        return $this->image->where(array('image_id' => $id))->delete();
+        return $this->image->where(array('image_id' => $id))->data(array('status' => 0))->update();
     }
 
     /**
@@ -166,7 +166,7 @@ class Attachment
         if ($id < 1) {
             return 0;
         }
-        return $this->file->where(array('file_id' => $id))->delete();
+        return $this->file->data(array('status' => 0))->where(array('file_id' => $id))->update();
     }
 
     /**
@@ -175,7 +175,19 @@ class Attachment
      */
     public function download($id)
     {
-
+        $info = $this->getFileInfo($id);
+        if (empty($info)) {
+            return;
+        }
+        $file = $info['path'];
+        if (!file_exists($file)) {
+            return;
+        }
+        header('Content-Disposition: attachment;filename=' . $file);
+        $handle = fopen($file, 'r');
+        while ($buffer = fgets($handle, 512)) {
+            echo $buffer;
+        }
     }
 
     /**
@@ -185,7 +197,11 @@ class Attachment
      */
     public function getAlbumnInfo($id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return array();
+        }
+        return $this->image_albumn->where(array('albumn_id' => $id, 'status' => 1))->select(true);
     }
 
     /**
@@ -195,7 +211,11 @@ class Attachment
      */
     public function getFileInfo($id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return array();
+        }
+        return $this->file->where(array('file_id' => $id, 'status' => 1))->select(true);
     }
 
     /**
@@ -205,7 +225,11 @@ class Attachment
      */
     public function getImageInfo($id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return array();
+        }
+        return $this->image->where(array('image_id' => $id, 'status' => 1))->select(true);
     }
 
     /**
@@ -217,6 +241,11 @@ class Attachment
      */
     public function getAlbumnImageList($id, $offset, $limit)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return array();
+        }
+        return $this->image_albumn->where(array('albumn_id' => $id, 'status' => 1))->order('add_time')
+            ->limit($limit, $offset)->select();
     }
 }

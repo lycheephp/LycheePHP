@@ -59,7 +59,7 @@ class Attachment
      */
     public function addAlbumn(array $data)
     {
-
+        return $this->image_albumn->data($data)->insert();
     }
 
     /**
@@ -70,7 +70,11 @@ class Attachment
      */
     public function editAlbumn(array $data, $id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->image_albumn->data($data)->where(array('albumn_id' => $id))->update();
     }
 
     /**
@@ -80,7 +84,11 @@ class Attachment
      */
     public function removeAlbumn($id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->image_albumn->where(array('albumn_id' => $id))->delete();
     }
 
     /**
@@ -90,7 +98,7 @@ class Attachment
      */
     public function addImage(array $data)
     {
-
+        return $this->image->data($data)->insert();
     }
 
     /**
@@ -101,7 +109,11 @@ class Attachment
      */
     public function editImage(array $data, $id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->image->where(array('image_id' => $id))->data($data)->update();
     }
 
     /**
@@ -111,7 +123,11 @@ class Attachment
      */
     public function removeImage($id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->image->where(array('image_id' => $id))->delete();
     }
 
     /**
@@ -121,7 +137,7 @@ class Attachment
      */
     public function addFile(array $data)
     {
-
+        return $this->file->data($data)->insert();
     }
 
     /**
@@ -132,7 +148,11 @@ class Attachment
      */
     public function editFile(array $data, $id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->file->data($data)->where(array('file_id' => $id))->update();
     }
 
     /**
@@ -142,7 +162,11 @@ class Attachment
      */
     public function removeFile($id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->file->where(array('file_id' => $id))->delete();
     }
 
     /**

@@ -247,7 +247,7 @@ class Attachment
         if ($id < 1) {
             return array();
         }
-        return $this->image_albumn->where(array('albumn_id' => $id, 'status' => 1))->order('add_time')
+        return $this->image_albumn->where(array('albumn_id' => $id, 'status' => 1))->order(array('sort', 'sort'))
             ->limit($limit, $offset)->select();
     }
 }

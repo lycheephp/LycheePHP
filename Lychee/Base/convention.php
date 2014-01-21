@@ -24,6 +24,7 @@ return array(
         'username' => 'root',
         'password' =>  'password',
         'db_name' => 'lychee',
+        'charset' => 'utf8',
     ),
     //日志配置
     'logger' => array(

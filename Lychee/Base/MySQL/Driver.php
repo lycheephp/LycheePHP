@@ -68,6 +68,7 @@ class Driver
         $this->username = $username;
         $this->password = $password;
         $this->dsn = "mysql:host={$host};port={$port};charset={$charset}";
+        //$this->dsn = "mysql:host={$host};port={$port}";
     }
 
     /**

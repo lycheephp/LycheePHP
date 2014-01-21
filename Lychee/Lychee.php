@@ -30,7 +30,7 @@ Loader::register();
  * 传入配置数组快速初始化荔枝
  * @param array $config
  */
-function lychee_init(array $config = array())
+function init(array $config = array())
 {
     Config::load($config);
 }

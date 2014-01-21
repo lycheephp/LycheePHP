@@ -26,11 +26,20 @@ include LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'Loader.php';
 Loader::register();
 
 /**
- * 便捷函数
+ * 初始化
  * 传入配置数组快速初始化荔枝
  * @param array $config
  */
 function init(array $config = array())
 {
     Config::load($config);
+}
+
+/**
+ * 注册外部模块
+ * @param string $module_dir
+ */
+function register($module_dir)
+{
+    Config::register($module_dir);
 }

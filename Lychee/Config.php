@@ -64,7 +64,12 @@ class Config
                 //读取该组件的默认配置
                 $config_path = $path . DIRECTORY_SEPARATOR . 'convention.php';
                 $key = strtolower($file);
-                $convention_config[$key] = include $config_path;
+                if (file_exists($config_path)) {
+                    $convention_config[$key] = include $config_path;
+                }
+                else {
+                    $convention_config[$key] = array();
+                }
             }
         }
         closedir($handle);
@@ -84,8 +89,7 @@ class Config
             $output[$key] = array_merge($base_convention, $value);
         };
         array_walk($lychee_config, $callback);
-        $lychee_config = $output;
-        self::$data = $lychee_config;
+        self::$data = $output;
         self::$is_load = true;
     }
 

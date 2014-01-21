@@ -20,6 +20,8 @@ namespace Lychee;
  * @author Samding
  */
 defined('LYCHEE_ROOT') || define('LYCHEE_ROOT', dirname(__FILE__));
+defined('LYCHEE_DEBUG') || define('LYCHEE_DEBUG', true);
+defined('LYCHEE_RUNTIME') || define('LYCHEE_RUNTIME', LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'runtime');
 include LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'Loader.php';
 
 //初始化自动加载

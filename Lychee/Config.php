@@ -52,7 +52,7 @@ class Config
     }
 
     /**
-     * 注册模块
+     * 手动注册外部模块
      * @param string $module_dir
      */
     public static function register($module_dir)
@@ -65,19 +65,19 @@ class Config
     }
 
     /**
-     * 加载配置信息
-     * @param array $custom_config
+     * 自动注册内部模块
      */
-    public static function load(array $custom_config)
+    private static function autoRegister()
     {
-        //已经加载过配置则退出
-        if (self::$is_load) {
+        $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . 'internal_module';
+        if (!LYCHEE_DEBUG && file_exists($runtime_file)) {
+            self::$internal_module = unserialize(file_get_contents($runtime_file));
             return;
         }
-        //扫描内部模块
+        //扫描并注册内部模块
         $root_path = LYCHEE_ROOT;//搜索路径
         $handle = opendir($root_path);
-        $ignore_dir = array('.', '..');
+        $ignore_dir = array('.', '..', 'runtime');
         while ($file = readdir($handle)) {
             if (in_array($file, $ignore_dir)) {
                 continue;
@@ -91,8 +91,27 @@ class Config
             self::$internal_module[$module_name] = $path;
         }
         closedir($handle);
-        //当前有效模块
-        $avaliable_module = array_merge(self::$internal_module, self::$external_module);
+        if (!LYCHEE_DEBUG) {
+            $handle = fopen($runtime_file, 'w');
+            flock($handle, LOCK_EX);
+            fputs($handle, serialize(self::$internal_module));
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+    }
+
+    /**
+     * 加载配置信息
+     * @param array $custom_config
+     */
+    public static function load(array $custom_config)
+    {
+        //已经加载过配置
+        if (self::$is_load) {
+            return;
+        }
+        self::autoRegister();//自动注册内部模块
+        $avaliable_module = array_merge(self::$internal_module, self::$external_module);//当前有效模块
         $convention_config = array();
         //读取模块默认配置
         foreach ($avaliable_module as $module_name => $module_path) {

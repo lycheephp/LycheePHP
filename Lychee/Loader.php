@@ -19,7 +19,7 @@ namespace Lychee;
  * @author Samding
  * @package Lychee
  */
-class Autoload
+class Loader
 {
     /**
      * 不允许实例化

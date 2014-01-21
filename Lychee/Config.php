@@ -81,7 +81,8 @@ class Config
             $config = $temp;
         }
         //合并配置
-        $lychee_config = array_merge($convention_config, $config);
+        //$lychee_config = array_merge($convention_config, $config);
+        $lychee_config = self::mergeConfig($convention_config, $config);
         $base_convention = $lychee_config['base'];
         $output = array();
         $callback = function ($value, $key) use (&$output, $base_convention)
@@ -91,6 +92,43 @@ class Config
         array_walk($lychee_config, $callback);
         self::$data = $output;
         self::$is_load = true;
+    }
+
+    /**
+     * 合并配置内部方法
+     * @param mixed $old
+     * @param mixed $new
+     * @return array
+     */
+    private static function __mergeConfig($old, $new)
+    {
+        foreach ($old as $key => $value) {
+            if (is_array($value)) {
+                if (isset($new[$key]))
+                    $new[$key] = self::__mergeConfig($value, $new[$key]);
+                else
+                    $new[$key] = $value;
+            }
+            else {
+                if (!isset($new[$key])) {
+                    $new[$key] = $value;
+                }
+            }
+        }
+        return $new;
+    }
+
+    /**
+     * 合并配置
+     * @param array $old
+     * @param array $new
+     * @return array
+     */
+    private static function mergeConfig(array $old, array $new)
+    {
+        $result = array_merge($old, $new);
+        $result = self::__mergeConfig($old, $result);
+        return $result;
     }
 
     /**

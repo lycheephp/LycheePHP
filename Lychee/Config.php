@@ -40,6 +40,15 @@ class Config
     }
 
     /**
+     * 注册模块
+     * @param string $module_dir
+     */
+    public static function register($module_dir)
+    {
+        //TODO
+    }
+
+    /**
      * 加载配置信息
      * @param array $config
      */

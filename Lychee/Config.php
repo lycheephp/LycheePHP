@@ -29,6 +29,18 @@ class Config
     private static $is_load = false;
 
     /**
+     * 外部模块列表
+     * @var array
+     */
+    private static $external_module = array();
+
+    /**
+     * 内部模块列表
+     * @var array
+     */
+    private static $internal_module = array();
+
+    /**
      * 配置信息
      * @var array
      */
@@ -45,53 +57,62 @@ class Config
      */
     public static function register($module_dir)
     {
-        //TODO
+        if (file_exists($module_dir)) {
+            $module_name = pathinfo($module_dir, PATHINFO_BASENAME);
+            $module_name = strtolower($module_name);
+            self::$external_module[$module_name] = $module_dir;
+        }
     }
 
     /**
      * 加载配置信息
-     * @param array $config
+     * @param array $custom_config
      */
-    public static function load(array $config)
+    public static function load(array $custom_config)
     {
         //已经加载过配置则退出
         if (self::$is_load) {
             return;
         }
-        //查看当前组件
-        $convention_config = array();
+        //扫描内部模块
         $root_path = LYCHEE_ROOT;//搜索路径
         $handle = opendir($root_path);
         $ignore_dir = array('.', '..');
         while ($file = readdir($handle)) {
-            if (!in_array($file, $ignore_dir)) {
-                $path = $root_path . DIRECTORY_SEPARATOR . $file;
-                //只扫描文件夹
-                if (!is_dir($path)) {
-                    continue;
-                }
-                //读取该组件的默认配置
-                $config_path = $path . DIRECTORY_SEPARATOR . 'convention.php';
-                $key = strtolower($file);
-                if (file_exists($config_path)) {
-                    $convention_config[$key] = include $config_path;
-                }
-                else {
-                    $convention_config[$key] = array();
-                }
+            if (in_array($file, $ignore_dir)) {
+                continue;
             }
+            $path = $root_path . DIRECTORY_SEPARATOR . $file;
+            //只扫描文件夹
+            if (!is_dir($path)) {
+                continue;
+            }
+            $module_name = strtolower($file);
+            self::$internal_module[$module_name] = $path;
         }
         closedir($handle);
+        //当前有效模块
+        $avaliable_module = array_merge(self::$internal_module, self::$external_module);
+        $convention_config = array();
+        //读取模块默认配置
+        foreach ($avaliable_module as $module_name => $module_path) {
+            $config_path = $module_path . DIRECTORY_SEPARATOR . 'convention.php';
+            if (file_exists($config_path)) {
+                $convention_config[$module_name] = include $config_path;
+            }
+            else {
+                $convention_config[$module_name] = array();
+            }
+        }
 
         //检查传入的配置
-        if (!isset($config['base'])) {
+        if (!isset($custom_config['base'])) {
             $temp = array();
-            $temp['base'] = $config;
-            $config = $temp;
+            $temp['base'] = $custom_config;
+            $custom_config = $temp;
         }
         //合并配置
-        //$lychee_config = array_merge($convention_config, $config);
-        $lychee_config = self::mergeConfig($convention_config, $config);
+        $lychee_config = self::mergeConfig($convention_config, $custom_config);
         $base_convention = $lychee_config['base'];
         $output = array();
         $callback = function ($value, $key) use (&$output, $base_convention)

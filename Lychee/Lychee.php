@@ -23,7 +23,7 @@ defined('LYCHEE_ROOT') || define('LYCHEE_ROOT', dirname(__FILE__));
 include LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'Loader.php';
 
 //初始化自动加载
-Autoload::register();
+Loader::register();
 
 /**
  * 便捷函数

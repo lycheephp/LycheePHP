@@ -106,26 +106,62 @@ class AdminSystem
 
     /**
      * 检查权限
+     * @param int $admin_id
+     * @param int $menu_id
+     * @return bool
      */
-    public function checkPrivilege()
+    public function checkPrivilege($admin_id, $menu_id)
     {
-
+        $admin_id = intval($admin_id);
+        if ($admin_id < 1) {
+            return false;
+        }
+        $menu_id = intval($menu_id);
+        if ($menu_id < 1) {
+            return false;
+        }
+        $admin_info = $this->admin->where(array('status' => 1, 'admin_id' => $admin_id))->field('role_id')->select(true);
+        if (empty($admin_info)) {
+            return false;
+        }
+        $role_id = $admin_info['role_id'];
+        $flag = $this->admin_privilege->where(array('role_id' => $role_id, 'menu_id' => $menu_id))->count() != 0;
+        return $flag;
     }
 
     /**
      * 分配权限
+     * @param int $role_id
+     * @param array $menu_ids
+     * @return int
      */
-    public function assignPrivilege()
+    public function assignPrivilege($role_id, array $menu_ids)
     {
-
+        $role_id = intval($role_id);
+        if ($role_id < 1) {
+            return 0;
+        }
+        $this->admin_privilege->where(array('role_id' => $role_id))->delete();
+        $flag = 0;
+        foreach ($menu_ids as $menu_id) {
+            $data = array();
+            $data['role_id'] = $role_id;
+            $data['menu_id'] = $role_id;
+            $flag += $this->admin_privilege->data($data)->insert();
+        }
+        return $flag;
     }
 
     /**
      * 移除后台管理菜单
+     * @param int $menu_id
+     * @return int
      */
-    public function removeMenu()
+    public function removeMenu($menu_id)
     {
-
+        $condition = array('menu_id' => $menu_id);
+        $this->admin_privilege->where($condition)->delete();
+        return $this->admin_menu->where($condition)->delete();
     }
 
 }

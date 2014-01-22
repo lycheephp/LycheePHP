@@ -130,13 +130,13 @@ class Archive
      * @param array $list
      * @return array
      */
-    private function arrangeCategoryTree($parent_id, array $list)
+    private static function arrangeCategoryTree($parent_id, array $list)
     {
         $result = array();
         foreach ($list as $info) {
             $temp = $info;
             if ($info['parent_id'] == $parent_id) {
-                $temp['children'] = $this->arrangeCategoryTree($temp['cate_id'], $list);
+                $temp['children'] = self::arrangeCategoryTree($temp['cate_id'], $list);
                 $result[] = $temp;
             }
         }
@@ -150,6 +150,6 @@ class Archive
     public function getCategoryTree()
     {
         $list = $this->archive->order('sort')->select();
-        return $this->arrangeCategoryTree(0, $list);
+        return self::arrangeCategoryTree(0, $list);
     }
 }

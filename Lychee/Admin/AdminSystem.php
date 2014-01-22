@@ -16,6 +16,7 @@ namespace Lychee\Admin;
 
 use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
+use Lychee\Base\MySQL\Operator as Operator;
 
 /**
  * 后台管理系统逻辑类
@@ -56,11 +57,51 @@ class AdminSystem
     }
 
     /**
-     * 以树状图方式获取菜单
+     * 整理菜单树
+     * @param int $parent_id
+     * @param array $list
+     * @return array
      */
-    public function getMenuTree()
+    private function arrangeMenu($parent_id, array $list)
     {
+        $result = array();
+        foreach ($list as $info) {
+            $temp = $info;
+            if ($info['parent_id'] == $parent_id) {
+                $temp['children'] = $this->arrangeCategoryTree($temp['menu_id'], $list);
+                $result[] = $temp;
+            }
+        }
+        return $result;
+    }
 
+    /**
+     * 根据会员以树状图方式获取菜单
+     * @param int $admin_id
+     * @return array
+     */
+    public function getMenuTree($admin_id)
+    {
+        $admin_id = intval($admin_id);
+        if ($admin_id < 1) {
+            return array();
+        }
+        $admin_info = $this->admin->where(array('status' => 1, 'admin_id' => $admin_id))->field('role_id')->select(true);
+        if (empty($admin_info)) {
+            return array();
+        }
+        $role_id = $admin_info['role_id'];
+        $menu_id_list = $this->admin_privilege->where(array('role_id' => $role_id))->select();
+        if (empty($menu_id_list)) {
+            return array();
+        }
+        $output = array();
+        foreach ($menu_id_list as $row) {
+            $output[] = $row['menu_id'];
+        }
+        $condition = array('role_id' => array(Operator::QUERY_IN => $output));
+        $menu_list = $this->admin_menu->where($condition)->order('sort')->select();
+        return self::arrangeMenu(0, $menu_list);
     }
 
     /**

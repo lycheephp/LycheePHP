@@ -32,12 +32,6 @@ class AdminUser
     private $admin;
 
     /**
-     * 后台管理菜单表查询类
-     * @var QueryHelper
-     */
-    private $admin_menu;
-
-    /**
      * 后台管理权限表
      * @var QueryHelper
      */
@@ -56,7 +50,6 @@ class AdminUser
     {
         $db_name = Config::get('admin.mysql.db_name');
         $this->admin = new QueryHelper('admin', $db_name);
-        $this->admin_menu = new QueryHelper('admin_menu', $db_name);
         $this->admin_privilege = new QueryHelper('admin_privilege', $db_name);
         $this->admin_role = new QueryHelper('admin_role', $db_name);
     }

@@ -34,7 +34,7 @@ Loader::register();
  */
 function init(array $config = array())
 {
-    Config::load($config);
+    Config::init($config);
 }
 
 /**

@@ -117,48 +117,81 @@ class AdminUser
         $data['username'] = $username;
         $data['hash'] = $hash;
         $data['salt'] = $salt;
+        $data['add_time'] = time();
         $data['status'] = 1;
         return $this->admin->data($data)->insert();
     }
 
     /**
      * 验证用户登录凭据
+     * @param string $username
+     * @param string $password
+     * @return int
      */
     public function auth($username, $password)
     {
-
+        $user_info = $this->admin->where(array('username' => $username))->select(true);
+        if (empty($user_info)) {
+            return -1;//用户不存在
+        }
+        if ($user_info['status'] == 0) {
+            return -2;//用户被冻结
+        }
+        $salt = $user_info['salt'];
+        $hash = self::generateHash($password, $user_info['hash']);
+        if ($hash != $user_info['hash']) {
+            return -3;//密码不正确
+        }
+        return $user_info['admin_id'];
     }
 
     /**
      * 解除用户冻结
+     * @param int $id
+     * @return int
      */
-    public function unblock()
+    public function unblock($id)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->admin->data(array('status' => 1))->where(array('admin_id' => $id))->update();
     }
 
     /**
      * 冻结用户
+     * @param int $id
+     * @return int
      */
-    public function block()
+    public function block($id)
     {
-
-    }
-
-    /**
-     * 移除用户
-     */
-    public function removeUser()
-    {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        return $this->admin->data(array('status' => 0))->where(array('admin_id' => $id))->update();
     }
 
     /**
      * 移除角色
+     * @param int $id
+     * @param bool $force
+     * @return int
      */
-    public function removeRole()
+    public function removeRole($id, $force = false)
     {
-
+        $id = intval($id);
+        if ($id < 1) {
+            return 0;
+        }
+        $user_count = $this->admin->where(array('role_id' => $id))->count();
+        if ($user_count && !$force) {
+            return -1;//该角色下还有用户
+        }
+        $this->admin->where(array('role_id' => $id))->delete();//删除该角色下的用户
+        $this->admin_privilege->where(array('role_id' => $id))->delete();//删除该角色的权限
+        return $this->admin_role->where(array('role_id' => $id))->delete();//删除角色
     }
 
 }

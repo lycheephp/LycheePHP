@@ -62,13 +62,13 @@ class AdminSystem
      * @param array $list
      * @return array
      */
-    private function arrangeMenu($parent_id, array $list)
+    private static function arrangeMenu($parent_id, array $list)
     {
         $result = array();
         foreach ($list as $info) {
             $temp = $info;
             if ($info['parent_id'] == $parent_id) {
-                $temp['children'] = $this->arrangeCategoryTree($temp['menu_id'], $list);
+                $temp['children'] = self::arrangeMenu($temp['menu_id'], $list);
                 $result[] = $temp;
             }
         }
@@ -146,7 +146,7 @@ class AdminSystem
         foreach ($menu_ids as $menu_id) {
             $data = array();
             $data['role_id'] = $role_id;
-            $data['menu_id'] = $role_id;
+            $data['menu_id'] = $menu_id;
             $flag += $this->admin_privilege->data($data)->insert();
         }
         return $flag;

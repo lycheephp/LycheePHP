@@ -131,7 +131,7 @@ class AdminUser
             return -2;//用户被冻结
         }
         $salt = $user_info['salt'];
-        $hash = self::generateHash($password, $user_info['hash']);
+        $hash = self::generateHash($password, $salt);
         if ($hash != $user_info['hash']) {
             return -3;//密码不正确
         }

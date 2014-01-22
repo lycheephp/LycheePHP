@@ -101,10 +101,10 @@ class Config
     }
 
     /**
-     * 加载配置信息
+     * 初始化配置
      * @param array $custom_config
      */
-    public static function load(array $custom_config)
+    public static function init(array $custom_config)
     {
         //已经加载过配置
         if (self::$is_load) {

@@ -9,7 +9,8 @@ CREATE TABLE `admin` (
   `hash` char(32) CHARACTER SET latin1 NOT NULL COMMENT '密码哈希值',
   `salt` char(10) CHARACTER SET latin1 NOT NULL COMMENT '哈希盐',
   `status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0:未启用 1:启用',
-  PRIMARY KEY (`admin_id`)
+  PRIMARY KEY (`admin_id`),
+  UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------

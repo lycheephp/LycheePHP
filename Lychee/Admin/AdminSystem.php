@@ -14,6 +14,9 @@
  */
 namespace Lychee\Admin;
 
+use Lychee\Config as Config;
+use Lychee\Base\MySQL\QueryHelper as QueryHelper;
+
 /**
  * 后台管理系统逻辑类
  * @author Samding
@@ -23,11 +26,33 @@ class AdminSystem
 {
 
     /**
+     * 后台管理菜单表查询类
+     * @var QueryHelper
+     */
+    private $admin_menu;
+
+    /**
+     * 后台管理权限表
+     * @var QueryHelper
+     */
+    private $admin_privilege;
+
+    /**
+     * 后台管理角色表
+     * @var QueryHelper
+     */
+    private $admin_role;
+
+    /**
      * 构造器
      */
     public function __construct()
     {
-
+        $db_name = Config::get('admin.mysql.db_name');
+        $this->admin = new QueryHelper('admin', $db_name);
+        $this->admin_menu = new QueryHelper('admin_menu', $db_name);
+        $this->admin_privilege = new QueryHelper('admin_privilege', $db_name);
+        $this->admin_role = new QueryHelper('admin_role', $db_name);
     }
 
     /**

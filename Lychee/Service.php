@@ -40,6 +40,22 @@ class Service
     }
 
     /**
+     * 设置服务
+     * @throws /Exception
+     * @param string $name
+     * @param mixed $value
+     */
+    public static function set($name, $value)
+    {
+        $name = trim($name);
+        $name = strtolower($name);
+        if (isset(self::$container[$name])) {
+            throw new \Exception('duplicate service name');
+        }
+        self::$container[$name] = $value;
+    }
+
+    /**
      * 获取服务
      * @param string $name
      * @param mixed $default

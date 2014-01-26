@@ -128,6 +128,15 @@ class HTTP
         return $url;
     }
 
+    public static function refresh()
+    {
+        $html = "<script>";
+        $html .= "location.reload()";
+        $html .= '</script>';
+        echo $html;
+        exit();
+    }
+
     /**
      * redirect
      * @param string $url

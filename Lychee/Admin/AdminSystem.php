@@ -99,7 +99,7 @@ class AdminSystem
         foreach ($menu_id_list as $row) {
             $output[] = $row['menu_id'];
         }
-        $condition = array('role_id' => array(Operator::QUERY_IN => $output));
+        $condition = array('menu_id' => array(Operator::QUERY_IN => $output));
         $menu_list = $this->admin_menu->where($condition)->order('sort')->select();
         return self::arrangeMenu(0, $menu_list);
     }

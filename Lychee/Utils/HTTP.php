@@ -128,6 +128,9 @@ class HTTP
         return $url;
     }
 
+    /**
+     * refresh page
+     */
     public static function refresh()
     {
         $html = "<script>";

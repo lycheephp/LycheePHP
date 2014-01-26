@@ -167,6 +167,20 @@ class AdminUser
     }
 
     /**
+     * 获取角色信息
+     * @param int $role_id
+     * @return array
+     */
+    public function getRoleInfo($role_id)
+    {
+        $role_id = intval($role_id);
+        if ($role_id < 1) {
+            return array();
+        }
+        return $this->admin_role->where(array('role_id' => $role_id))->select(true);
+    }
+
+    /**
      * 移除角色
      * @param int $id
      * @param bool $force

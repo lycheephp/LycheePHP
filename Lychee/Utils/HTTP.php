@@ -179,20 +179,32 @@ class HTTP
      * get session
      * @param string $name
      * @param mixed $default
+     * @param string $namespace
      * @return string
      */
-    public static function getSession($name, $default = null)
+    public static function getSession($name, $default = null, $namespace = null)
     {
-        $value = isset($_SESSION[$name])?$_SESSION[$name]:$default;
+        if (empty($namespace)) {
+            $value = isset($_SESSION[$name])?$_SESSION[$name]:$default;
+        }
+        else {
+            $value = isset($_SESSION[$namespace][$name])?$_SESSION[$namespace][$name]:$default;
+        }
         if ($value === $default) {
             return $default;
         }
-        if (!isset($_SESSION[$name . '_md5'])) {
+        if (empty($namespace) && !isset($_SESSION[$name . '_md5'])) {
+            return $default;
+        }
+        if (!empty($namespace) && !isset($_SESSION[$namespace][$name . '_md5'])) {
             return $default;
         }
         $encrypt_key = self::$encrypt_key;
         $encrypt = substr(md5($encrypt_key . $value . session_id()), 0, 16);
-        if ($_SESSION[$name . '_md5'] == $encrypt) {
+        if (empty($namespace) && $_SESSION[$name . '_md5'] == $encrypt) {
+            return $value;
+        }
+        if (!empty($namespace) && $_SESSION[$namespace][$name . '_md5'] == $encrypt) {
             return $value;
         }
         return $default;
@@ -202,23 +214,38 @@ class HTTP
      * set session
      * @param string $name
      * @param mixed $value
+     * @param string $namespace
      */
-    public static function setSession($name, $value)
+    public static function setSession($name, $value, $namespace = null)
     {
         $encrypt_key = self::$encrypt_key;
         $encrypt = substr(md5($encrypt_key . $value . session_id()), 0, 16);
-        $_SESSION[$name] = $value;
-        $_SESSION[$name . '_md5'] = $encrypt;
+        if (empty($namespace)) {
+            $_SESSION[$name] = $value;
+            $_SESSION[$name . '_md5'] = $encrypt;
+        }
+        else {
+            $_SESSION[$namespace][$name] = $value;
+            $_SESSION[$namespace][$name . '_md5'] = $encrypt;
+        }
+
     }
 
     /**
      * unset session
      * @param string $name
+     * @param string $namespace
      */
-    public static function unsetSession($name)
+    public static function unsetSession($name, $namespace = null)
     {
-        unset($_SESSION[$name]);
-        unset($_SESSION[$name . '_md5']);
+        if (empty($namespace)) {
+            unset($_SESSION[$name]);
+            unset($_SESSION[$name . '_md5']);
+        }
+        else {
+            unset($_SESSION[$namespace][$name]);
+            unset($_SESSION[$namespace][$name . '_md5']);
+        }
     }
 
     /**

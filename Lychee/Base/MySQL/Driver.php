@@ -140,7 +140,7 @@ class Driver
         else {
             $result = $this->pdo->quote($str, \PDO::PARAM_STR);
         }
-        return $result;
+        return trim($result, "'");
     }
 
     /**

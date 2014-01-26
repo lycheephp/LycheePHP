@@ -167,6 +167,20 @@ class AdminUser
     }
 
     /**
+     * 获取用户信息
+     * @param int $admin_id
+     * @return arary
+     */
+    public function getAdminInfo($admin_id)
+    {
+        $admin_id = intval($admin_id);
+        if ($admin_id < 1) {
+            return array();
+        }
+        return $this->admin->where(array('admin_id' => $admin_id))->select(true);
+    }
+
+    /**
      * 获取角色信息
      * @param int $role_id
      * @return array

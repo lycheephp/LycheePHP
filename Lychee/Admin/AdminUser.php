@@ -119,7 +119,7 @@ class AdminUser
      * 验证用户登录凭据
      * @param string $username
      * @param string $password
-     * @return int
+     * @return array|int list($admin_id, $role_id, $username)
      */
     public function auth($username, $password)
     {
@@ -135,7 +135,7 @@ class AdminUser
         if ($hash != $user_info['hash']) {
             return -3;//密码不正确
         }
-        return $user_info['admin_id'];
+        return array($user_info['admin_id'], $user_info['role_id'], $user_info['username']);
     }
 
     /**

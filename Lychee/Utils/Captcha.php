@@ -230,6 +230,9 @@ class Captcha
         //save captcha info
         self::saveInfo($this->captcha, $this->duration, $this->namespace, $this->store_type);
         header("Content-type: image/jpeg");
+        header("Cache-Control: no-cache");
+        header("Pragma: no-cache");
+        header("Expires: -1");
         imagejpeg($this->image_handle);
         $this->release();
     }

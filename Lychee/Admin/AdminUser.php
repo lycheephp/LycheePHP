@@ -116,6 +116,47 @@ class AdminUser
     }
 
     /**
+     * 更改吗密码
+     * @param int $admin_id
+     * @param string $old
+     * @param string $new
+     * @return int|bool
+     */
+    public function changePassword($admin_id, $old, $new)
+    {
+        $admin_id = intval($admin_id);
+        if ($admin_id < 1) {
+            return -1;//不存在该用户
+        }
+        $admin_info = $this->admin->where(array('admin_id' => $admin_id))->select(true);
+        if (empty($admin_info)) {
+            return -1;
+        }
+        $username = $admin_info['username'];
+        $flag = $this->auth($username, $old);
+        if ($flag < 1) {
+            return -2;//旧密码不正确
+        }
+        return $this->resetPassword($admin_id, $new);
+    }
+
+    /**
+     * 重设密码
+     * @param int $admin_id
+     * @param string $password
+     * @return bool
+     */
+    public function resetPassword($admin_id, $password)
+    {
+        $salt = self::generateSalt();
+        $hash = self::generateHash($password, $salt);
+        $data['salt'] = $salt;
+        $data['hash'] = $hash;
+        $flag = $this->admin->data($data)->where(array('admin_id' => $admin_id))->update();
+        return $flag > 0;
+    }
+
+    /**
      * 验证用户登录凭据
      * @param string $username
      * @param string $password

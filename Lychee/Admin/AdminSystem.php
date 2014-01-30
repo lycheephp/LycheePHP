@@ -100,7 +100,7 @@ class AdminSystem
             $output[] = $row['menu_id'];
         }
         $condition = array('menu_id' => array(Operator::QUERY_IN => $output));
-        $menu_list = $this->admin_menu->where($condition)->order('sort')->select();
+        $menu_list = $this->admin_menu->where($condition)->order('sort', Operator::SORT_ASC)->select();
         return self::arrangeMenu(0, $menu_list);
     }
 

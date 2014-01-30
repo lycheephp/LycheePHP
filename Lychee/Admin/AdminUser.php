@@ -120,7 +120,7 @@ class AdminUser
      * @param int $admin_id
      * @param string $old
      * @param string $new
-     * @return int|bool
+     * @return int
      */
     public function changePassword($admin_id, $old, $new)
     {
@@ -144,7 +144,7 @@ class AdminUser
      * 重设密码
      * @param int $admin_id
      * @param string $password
-     * @return bool
+     * @return int
      */
     public function resetPassword($admin_id, $password)
     {
@@ -153,7 +153,7 @@ class AdminUser
         $data['salt'] = $salt;
         $data['hash'] = $hash;
         $flag = $this->admin->data($data)->where(array('admin_id' => $admin_id))->update();
-        return $flag > 0;
+        return intval($flag > 0);
     }
 
     /**

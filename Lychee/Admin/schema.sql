@@ -48,3 +48,16 @@ CREATE TABLE `admin_role` (
   `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for admin_auth_log
+-- ----------------------------
+DROP TABLE IF EXISTS `admin_auth_log`;
+CREATE TABLE `admin_auth_log` (
+  `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `admin_id` int(10) unsigned NOT NULL COMMENT '管理员ID',
+  `ip` varchar(50) NOT NULL COMMENT 'ip地址',
+  `add_time` int(10) unsigned NOT NULL COMMENT '记录时间',
+  `status` tinyint(3) unsigned NOT NULL COMMENT '0:登录失败 1:登录成功',
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

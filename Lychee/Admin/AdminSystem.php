@@ -107,17 +107,17 @@ class AdminSystem
     /**
      * 检查权限
      * @param int $admin_id
-     * @param int $menu_id
+     * @param string $code
      * @return bool
      */
-    public function checkPrivilege($admin_id, $menu_id)
+    public function checkPrivilege($admin_id, $code)
     {
         $admin_id = intval($admin_id);
         if ($admin_id < 1) {
             return false;
         }
-        $menu_id = intval($menu_id);
-        if ($menu_id < 1) {
+        $code = trim($code);
+        if (empty($code)) {
             return false;
         }
         $admin_info = $this->admin->where(array('status' => 1, 'admin_id' => $admin_id))->field('role_id')->select(true);
@@ -125,8 +125,13 @@ class AdminSystem
             return false;
         }
         $role_id = $admin_info['role_id'];
-        $flag = $this->admin_privilege->where(array('role_id' => $role_id, 'menu_id' => $menu_id))->count() != 0;
-        return $flag;
+        $menu_info = $this->admin_menu->where(array('code' => $code))->select(true);
+        if (empty($menu_info)) {
+            return false;
+        }
+        $count = $this->admin_privilege->where(array('role_id' => $role_id, 'menu_id' => $menu_info['menu_id']))->
+                count();
+        return $count != 0;
     }
 
     /**

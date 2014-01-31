@@ -69,7 +69,7 @@ class Config
      */
     private static function autoRegister()
     {
-        $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . 'internal_module';
+        $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . 'internal_module.runtime';
         if (!LYCHEE_DEBUG && file_exists($runtime_file)) {
             self::$internal_module = unserialize(file_get_contents($runtime_file));
             return;

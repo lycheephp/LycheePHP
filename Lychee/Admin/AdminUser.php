@@ -14,8 +14,10 @@
  */
 namespace Lychee\Admin;
 
+use Lychee\Base\MySQL\Operator;
 use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
+use Lychee\Utils\HTTP as HTTP;
 
 /**
  * 后台系统用户逻辑类
@@ -44,6 +46,12 @@ class AdminUser
     private $admin_role;
 
     /**
+     * 后台管理员验证日志
+     * @var QueryHelper
+     */
+    private $admin_auth_log;
+
+    /**
      * 构造器
      */
     public function __construct()
@@ -52,6 +60,7 @@ class AdminUser
         $this->admin = new QueryHelper('admin', $db_name);
         $this->admin_privilege = new QueryHelper('admin_privilege', $db_name);
         $this->admin_role = new QueryHelper('admin_role', $db_name);
+        $this->admin_auth_log = new QueryHelper('admin_auth_log', $db_name);
     }
 
     /**
@@ -164,19 +173,51 @@ class AdminUser
      */
     public function auth($username, $password)
     {
+        //验证日志数据
+        $data = array();
+        $data['admin_id'] = 0;
+        $data['ip'] = HTTP::getClientIP();
+        $data['add_time'] =time();
         $user_info = $this->admin->where(array('username' => $username))->select(true);
         if (empty($user_info)) {
+            //写入记录
+            $data['status'] = 0;
+            $this->admin_auth_log->data($data)->insert();
             return -1;//用户不存在
         }
         if ($user_info['status'] == 0) {
+            $data['admin_id'] = $user_info['admin_id'];
+            $data['status'] = 0;
+            $this->admin_auth_log->data($data)->insert();
             return -2;//用户被冻结
         }
         $salt = $user_info['salt'];
         $hash = self::generateHash($password, $salt);
         if ($hash != $user_info['hash']) {
+            $data['admin_id'] = $user_info['admin_id'];
+            $data['status'] = 0;
+            $this->admin_auth_log->data($data)->insert();
             return -3;//密码不正确
         }
+        $data['admin_id'] = $user_info['admin_id'];
+        $data['status'] = 1;
+        $this->admin_auth_log->data($data)->insert();
         return array($user_info['admin_id'], $user_info['role_id'], $user_info['username']);
+    }
+
+    /**
+     * 获取最近登录凭据验证记录
+     * @param int $admin_id
+     * @return array
+     */
+    public function getLastAuthLog($admin_id)
+    {
+        $admin_id = intval($admin_id);
+        if ($admin_id < 1) {
+            return array();
+        }
+        return $this->admin_auth_log->where(array('admin_id' => $admin_id))->order('add_time', Operator::SORT_DESC)->
+            select(true);
     }
 
     /**

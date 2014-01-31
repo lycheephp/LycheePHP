@@ -82,7 +82,7 @@ class Logger
             mkdir($dir_path, 0777, true);
         }
         //写入信息
-        $handle = fopen($log_path, 'a');
+        $handle = fopen($log_path . '.txt', 'a');
         flock($handle, LOCK_EX);
         $lines[] = self::$log_delimiter . PHP_EOL . PHP_EOL . PHP_EOL;
         foreach ($lines as $line) {

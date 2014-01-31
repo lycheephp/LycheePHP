@@ -86,7 +86,7 @@ class Logger
         flock($handle, LOCK_EX);
         $lines[] = self::$log_delimiter . PHP_EOL . PHP_EOL . PHP_EOL;
         foreach ($lines as $line) {
-            $lines .= PHP_EOL;
+            $line .= PHP_EOL;
             fwrite($handle, $line);
         }
         flock($handle, LOCK_UN);
@@ -101,6 +101,9 @@ class Logger
     {
         $result = array();
         foreach ($_GET as $key => $value) {
+            if (is_array($value)) {
+                $value = var_export($value, true);
+            }
             $result[] = "{$key}={$value}";
         }
         return implode(', ', $result);
@@ -113,6 +116,9 @@ class Logger
     {
         $result = array();
         foreach ($_POST as $key => $value) {
+            if (is_array($value)) {
+                $value = var_export($value, true);
+            }
             $result[] = "{$key}={$value}";
         }
         return implode(', ', $result);
@@ -126,6 +132,9 @@ class Logger
     {
         $result = array();
         foreach ($_SESSION as $key => $value) {
+            if (is_array($value)) {
+                $value = var_export($value, true);
+            }
             $result[] = "{$key}={$value}";
         }
         return implode(', ', $result);
@@ -139,6 +148,9 @@ class Logger
     {
         $result = array();
         foreach ($_COOKIE as $key => $value) {
+            if (is_array($value)) {
+                $value = var_export($value, true);
+            }
             $result[] = "{$key}={$value}";
         }
         return implode(', ', $result);
@@ -153,6 +165,12 @@ class Logger
     {
         $result = array();
         foreach ($context as $key => $value) {
+            if (is_array($value)) {
+                $value = var_export($value, true);
+            }
+            elseif (is_object($value)) {
+                $value = $this->getContextStr($value);
+            }
             $result[] = "{$key}:{$value}";
         }
         return implode(', ', $result);
@@ -252,7 +270,7 @@ class Logger
         $lines = array();
         $lines[] = "LEVEL:" . $level;
         $lines[] = "TIME:" . date("Y-m-d H:i:s");
-        $lines[] = "HTTP_REFERER:" . $_SERVER['HTTP_REFERER'];
+        $lines[] = "HTTP_REFERER:" . (isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'');
         $lines[] = "GET:" . $this->getGetStr();
         $lines[] = "POST:" . $this->getPostStr();
         $lines[] = "SESSION:" . $this->getSessionStr();

@@ -198,7 +198,7 @@ class Pager
         }
         $output[] = "{$this->page_key}={$page}";
         $query_str = implode('&', $output);
-        return $page . '?' . $query_str;
+        return $path . '?' . $query_str;
     }
 
     /**
@@ -209,7 +209,7 @@ class Pager
     public function getPageList($size = 5)
     {
         $total_page = $this->getTotalPage();
-        $current_page = $this->getTotalPage();
+        $current_page = $this->getPage();
         if ($size % 2 == 0) {
             $size += 1;
         }

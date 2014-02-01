@@ -198,7 +198,7 @@ class Pager
         }
         $output[] = "{$this->page_key}={$page}";
         $query_str = implode('&', $output);
-        return $page . '?' . $query_str;
+        return $path . '?' . $query_str;
     }
 
     /**

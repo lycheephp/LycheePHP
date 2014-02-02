@@ -298,6 +298,25 @@ class AdminUser
     }
 
     /**
+     * 获取角色列表
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    public function getRoleList($offset, $limit)
+    {
+        $result = $this->admin_role->limit($limit, $offset)->order('role_id', Operator::SORT_ASC)->select();
+        $output = array();
+        foreach ($result as $info) {
+            $role_id = $info['role_id'];
+            $admin_count = $this->admin->where(array('role_id' => $role_id))->count();
+            $info['admin_count'] = $admin_count;
+            $output[] = $info;
+        }
+        return $output;
+    }
+
+    /**
      * 获取用户列表
      * @param int $offset
      * @param int $limit
@@ -335,6 +354,15 @@ class AdminUser
     public function getAdminCount()
     {
         return $this->admin->count();
+    }
+
+    /**
+     * 获取角色总数
+     * @return int
+     */
+    public function getRoleCount()
+    {
+        return $this->admin_role->count();
     }
 
 }

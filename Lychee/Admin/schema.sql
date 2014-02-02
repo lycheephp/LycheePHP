@@ -23,10 +23,10 @@ CREATE TABLE `admin_menu` (
   `parent_id` int(10) unsigned NOT NULL COMMENT '父节点ID',
   `name` varchar(20) NOT NULL COMMENT '后台菜单名称',
   `code` varchar(20) NOT NULL COMMENT '后台菜单代码',
-  `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
+  `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '升序排序',
   PRIMARY KEY (`menu_id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for admin_privilege
@@ -46,8 +46,9 @@ CREATE TABLE `admin_role` (
   `role_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '角色ID',
   `name` varchar(20) NOT NULL COMMENT '角色名称',
   `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
+  `add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
   PRIMARY KEY (`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for admin_auth_log

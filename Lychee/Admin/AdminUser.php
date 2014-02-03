@@ -110,7 +110,7 @@ class AdminUser
             return -1;//用户名已存在
         }
         $flag = $this->admin_role->where(array('role_id' => $role_id))->count() == 0;
-        if (!$flag) {
+        if ($flag) {
             return -2;//不存在的角色
         }
         $salt = self::generateSalt();

@@ -405,7 +405,24 @@ class AdminUser
         if ($count != 0) {
             return 0;
         }
+        $this->admin_privilege->where($condition)->delete();
         return $this->admin_role->where($condition)->delete();
+    }
+
+    /**
+     * 删除管理员用户
+     * @param int $admin_id
+     * @return int
+     */
+    public function deleteAdmin($admin_id)
+    {
+        $admin_id = intval($admin_id);
+        if ($admin_id < 1) {
+            return 0;
+        }
+        $condition = array('admin_id' => $admin_id);
+        $this->admin_auth_log->where($condition)->delete();
+        return $this->admin->where($condition)->delete();
     }
 
 }

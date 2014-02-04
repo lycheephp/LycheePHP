@@ -365,4 +365,29 @@ class AdminUser
         return $this->admin_role->count();
     }
 
+    /**
+     * 编辑角色资料
+     * @param array $data
+     * @param int $role_id
+     * @return int
+     */
+    public function editRole(array $data, $role_id)
+    {
+        $role_id = intval($role_id);
+        if ($role_id < 1) {
+            return 0;
+        }
+        return $this->admin_role->data($data)->where(array('role_id' => $role_id))->update();
+    }
+
+    /**
+     * 添加角色资料
+     * @param array $data
+     * @return int
+     */
+    public function addRole(array $data)
+    {
+        return $this->admin_role->data($data)->insert();
+    }
+
 }

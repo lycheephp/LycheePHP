@@ -45,7 +45,6 @@ DROP TABLE IF EXISTS `admin_role`;
 CREATE TABLE `admin_role` (
   `role_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '角色ID',
   `name` varchar(20) NOT NULL COMMENT '角色名称',
-  `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
   `add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;

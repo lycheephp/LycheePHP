@@ -305,7 +305,7 @@ class AdminUser
      */
     public function getRoleList($offset, $limit)
     {
-        $result = $this->admin_role->limit($limit, $offset)->order('sort')->select();
+        $result = $this->admin_role->limit($limit, $offset)->order('role_id', Operator::SORT_ASC)->select();
         $output = array();
         foreach ($result as $info) {
             $role_id = $info['role_id'];

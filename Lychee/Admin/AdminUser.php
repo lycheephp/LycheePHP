@@ -410,6 +410,21 @@ class AdminUser
     }
 
     /**
+     * 编辑管理员用户
+     * @param array $data
+     * @param int $admin_id
+     * @return int
+     */
+    public function editAdmin(array $data, $admin_id)
+    {
+        $admin_id = intval($admin_id);
+        if ($admin_id < 1) {
+            return 0;
+        }
+        return $this->admin->data($data)->where(array('admin_id' => $admin_id))->update();
+    }
+
+    /**
      * 删除管理员用户
      * @param int $admin_id
      * @return int

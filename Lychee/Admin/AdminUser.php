@@ -390,4 +390,22 @@ class AdminUser
         return $this->admin_role->data($data)->insert();
     }
 
+    /**
+     * 删除角色资料
+     * @param int $role_id
+     * @return int
+     */
+    public function deleteRole($role_id) {
+        $role_id = intval($role_id);
+        if ($role_id < 1) {
+            return 0;
+        }
+        $condition = array('role_id' => $role_id);
+        $count = $this->admin->where($condition)->count();
+        if ($count != 0) {
+            return 0;
+        }
+        return $this->admin_role->where($condition)->delete();
+    }
+
 }

@@ -365,4 +365,64 @@ class AdminUser
         return $this->admin_role->count();
     }
 
+    /**
+     * 编辑角色资料
+     * @param array $data
+     * @param int $role_id
+     * @return int
+     */
+    public function editRole(array $data, $role_id)
+    {
+        $role_id = intval($role_id);
+        if ($role_id < 1) {
+            return 0;
+        }
+        return $this->admin_role->data($data)->where(array('role_id' => $role_id))->update();
+    }
+
+    /**
+     * 添加角色资料
+     * @param array $data
+     * @return int
+     */
+    public function addRole(array $data)
+    {
+        return $this->admin_role->data($data)->insert();
+    }
+
+    /**
+     * 删除角色资料
+     * @param int $role_id
+     * @return int
+     */
+    public function deleteRole($role_id) {
+        $role_id = intval($role_id);
+        if ($role_id < 1) {
+            return 0;
+        }
+        $condition = array('role_id' => $role_id);
+        $count = $this->admin->where($condition)->count();
+        if ($count != 0) {
+            return 0;
+        }
+        $this->admin_privilege->where($condition)->delete();
+        return $this->admin_role->where($condition)->delete();
+    }
+
+    /**
+     * 删除管理员用户
+     * @param int $admin_id
+     * @return int
+     */
+    public function deleteAdmin($admin_id)
+    {
+        $admin_id = intval($admin_id);
+        if ($admin_id < 1) {
+            return 0;
+        }
+        $condition = array('admin_id' => $admin_id);
+        $this->admin_auth_log->where($condition)->delete();
+        return $this->admin->where($condition)->delete();
+    }
+
 }

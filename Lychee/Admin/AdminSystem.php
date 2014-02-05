@@ -76,6 +76,35 @@ class AdminSystem
     }
 
     /**
+     * 以树状图方式获取全部菜单
+     * @return array
+     */
+    public function getAllMenuTree()
+    {
+        $menu_list = $this->admin_menu->order(array('sort', 'menu_id'), Operator::SORT_ASC)->select();
+        return self::arrangeMenu(0, $menu_list);
+    }
+
+    /**
+     * 获取角色权限
+     * @param int $role_id
+     * @return array
+     */
+    public function getRolePrivilege($role_id)
+    {
+        $role_id = intval($role_id);
+        if ($role_id < 1) {
+            return array();
+        }
+        $list = $this->admin_privilege->where(array('role_id' => $role_id))->select();
+        $output = array();
+        foreach ($list as $info) {
+            $output[] = $info['menu_id'];
+        }
+        return $output;
+    }
+
+    /**
      * 根据会员以树状图方式获取菜单
      * @param int $admin_id
      * @return array

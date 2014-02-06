@@ -198,4 +198,27 @@ class AdminSystem
         return $this->admin_menu->where($condition)->delete();
     }
 
+    /**
+     * 获取菜单信息
+     * @param int $menu_id
+     * @return array
+     */
+    public function getMenuInfo($menu_id)
+    {
+        $menu_id = intval($menu_id);
+        if ($menu_id < 1) {
+            return array();
+        }
+        return $this->admin_menu->where(array('menu_id' => $menu_id))->select(true);
+    }
+
+    /**
+     * 获取菜单列表
+     * @return array
+     */
+    public function getMenuList()
+    {
+        return $this->admin_menu->order(array('sort', 'menu_id'), Operator::SORT_ASC)->select();
+    }
+
 }

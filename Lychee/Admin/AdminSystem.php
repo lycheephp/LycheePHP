@@ -191,11 +191,79 @@ class AdminSystem
      * @param int $menu_id
      * @return int
      */
-    public function removeMenu($menu_id)
+    public function deleteMenu($menu_id)
     {
+        $menu_id = intval($menu_id);
+        if ($menu_id < 1) {
+            return 0;
+        }
+        $count = $this->admin_menu->where(array('parent_id' => $menu_id))->count();
+        if ($count != 0) {
+            return 0;
+        }
         $condition = array('menu_id' => $menu_id);
         $this->admin_privilege->where($condition)->delete();
         return $this->admin_menu->where($condition)->delete();
+    }
+
+    /**
+     * 获取菜单信息
+     * @param int $menu_id
+     * @return array
+     */
+    public function getMenuInfo($menu_id)
+    {
+        $menu_id = intval($menu_id);
+        if ($menu_id < 1) {
+            return array();
+        }
+        return $this->admin_menu->where(array('menu_id' => $menu_id))->select(true);
+    }
+
+    /**
+     * 获取菜单列表
+     * @return array
+     */
+    public function getMenuList()
+    {
+        return $this->admin_menu->order(array('sort', 'menu_id'), Operator::SORT_ASC)->select();
+    }
+
+    /**
+     * 判断菜单代码是否存在
+     * @param $code
+     * @return bool
+     */
+    public function isCodeExist($code)
+    {
+        $code = trim($code);
+        $code = strtolower($code);
+        return $this->admin_menu->where(array('code' => $code))->count() != 0;
+    }
+
+    /**
+     * 添加菜单
+     * @param array $data
+     * @return int
+     */
+    public function addMenu(array $data)
+    {
+        return $this->admin_menu->data($data)->insert();
+    }
+
+    /**
+     * 更新菜单
+     * @param array $data
+     * @param int $menu_id
+     * @return int
+     */
+    public function editMenu(array $data, $menu_id)
+    {
+        $menu_id = intval($menu_id);
+        if ($menu_id < 1) {
+            return 0;
+        }
+        return $this->admin_menu->data($data)->where(array('menu_id' => $menu_id))->update();
     }
 
 }

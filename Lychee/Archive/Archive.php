@@ -121,7 +121,7 @@ class Archive
         if ($id < 1) {
             return array();
         }
-        return $this->archive->where(array('cate_id' => $id))->select(true);
+        return $this->category->where(array('cate_id' => $id))->select(true);
     }
 
     /**
@@ -151,5 +151,59 @@ class Archive
     {
         $list = $this->category->order('sort')->select();
         return self::arrangeCategoryTree(0, $list);
+    }
+
+    /**
+     * 获取分类列表
+     * @return array
+     */
+    public function getCategoryList()
+    {
+        return $this->category->order('sort')->select();
+    }
+
+    /**
+     * 编辑分类
+     * @param array $data
+     * @param int $cate_id
+     * @return int
+     */
+    public function editCategory(array $data, $cate_id)
+    {
+        $cate_id = intval($cate_id);
+        if ($cate_id < 1) {
+            return 0;
+        }
+        return $this->category->data($data)->where(array('cate_id' => $cate_id))->update();
+    }
+
+    /**
+     * 添加文章分类
+     * @param array $data
+     * @return int
+     */
+    public function addCategory(array $data)
+    {
+        return $this->category->data($data)->insert();
+    }
+
+    /**
+     * 删除文章分类
+     * @param $cate_id
+     * @return int
+     */
+    public function deleteCategory($cate_id)
+    {
+        $cate_id = intval($cate_id);
+        if ($cate_id < 1) {
+            return 0;
+        }
+        $count = $this->category->where(array('parent_id' => $cate_id))->count();
+        if ($count != 0) {
+            return 0;
+        }
+        $condition = array('cate_id' => $cate_id);
+        $this->archive->where($condition)->delete();
+        return $this->category->where($condition)->delete();
     }
 }

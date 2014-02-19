@@ -152,4 +152,13 @@ class Archive
         $list = $this->category->order('sort')->select();
         return self::arrangeCategoryTree(0, $list);
     }
+
+    /**
+     * 获取分类列表
+     * @return array
+     */
+    public function getCategoryList()
+    {
+        return $this->category->order('sort')->select();
+    }
 }

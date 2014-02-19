@@ -65,14 +65,57 @@ class Config
     }
 
     /**
+     * 读取运行时
+     * @param string $name
+     * @return array
+     */
+    private static function readRuntime($name)
+    {
+        $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . "{$name}.runtime";
+        $content = file_get_contents($runtime_file);
+        $temp = self::desDecrypt($content, __CLASS__);
+        $data = unserialize($temp);
+        return $data;
+    }
+
+    /**
+     * 写入运行时
+     * @param array $data
+     * @param string $name
+     */
+    private static function writeRuntime(array $data, $name)
+    {
+        $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . "{$name}.runtime";
+        $temp = serialize($data);
+        $content = self::desEncrypt($temp, __CLASS__);
+        $handle = fopen($runtime_file, 'w');
+        flock($handle, LOCK_EX);
+        fputs($handle, $content);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+    }
+
+    /**
+     * 判断运行时是否存在
+     * @param $name
+     * @return bool
+     */
+    private static function isRuntimeExist($name)
+    {
+        $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . "{$name}.runtime";
+        return file_exists($runtime_file);
+    }
+
+    /**
      * 自动注册内部模块
      */
     private static function autoRegister()
     {
-        $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . 'internal_module.runtime';
-        if (!LYCHEE_DEBUG && file_exists($runtime_file)) {
-            self::$internal_module = unserialize(file_get_contents($runtime_file));
-            return;
+        if (!LYCHEE_DEBUG && self::isRuntimeExist('internal_module')) {
+            self::$internal_module = self::readRuntime('internal_module');
+            if (!empty(self::$internal_module)) {
+                return;
+            }
         }
         //扫描并注册内部模块
         $root_path = LYCHEE_ROOT;//搜索路径
@@ -92,11 +135,7 @@ class Config
         }
         closedir($handle);
         if (!LYCHEE_DEBUG) {
-            $handle = fopen($runtime_file, 'w');
-            flock($handle, LOCK_EX);
-            fputs($handle, serialize(self::$internal_module));
-            flock($handle, LOCK_UN);
-            fclose($handle);
+            self::writeRuntime(self::$internal_module, 'internal_module');
         }
     }
 
@@ -109,6 +148,13 @@ class Config
         //已经加载过配置
         if (self::$is_load) {
             return;
+        }
+        if (!LYCHEE_DEBUG && self::isRuntimeExist('lychee_config')) {
+            self::$data = self::readRuntime('lychee_config');
+            if (!empty(self::$data)) {
+                self::$is_load = true;
+                return;
+            }
         }
         self::autoRegister();//自动注册内部模块
         $avaliable_module = array_merge(self::$internal_module, self::$external_module);//当前有效模块
@@ -141,6 +187,9 @@ class Config
         array_walk($lychee_config, $callback);
         self::$data = $output;
         self::$is_load = true;
+        if (!LYCHEE_DEBUG) {
+            self::writeRuntime(self::$data, 'lychee_config');
+        }
     }
 
     /**
@@ -209,6 +258,53 @@ class Config
                 break;
             }
         }
+        return $result;
+    }
+
+    /**
+     * 3DES加密
+     * @param string $content
+     * @param string $key 加密密钥
+     * @return string
+     */
+    private static function desEncrypt($content, $key)
+    {
+        //填充内容至8的倍数
+        $pad_len = 8 - (mb_strlen($content) % 8);
+        for ($i = 0; $i < $pad_len; $i++) {
+            $content .= chr(0);
+        }
+        //使用3des，CBC模式
+        $td = mcrypt_module_open(MCRYPT_3DES, '', MCRYPT_MODE_CBC, '');
+        //开始加密
+        mcrypt_generic_init($td, $key, '88002233');
+        $data = mcrypt_generic($td, $content);
+        mcrypt_generic_deinit($td);
+        mcrypt_module_close($td);
+        //删除回车和换行
+        $data = base64_encode($data);
+        $result = str_replace(PHP_EOL, '', $data);
+        return $result;
+    }
+
+    /**
+     * 3DES解密
+     * @param string $content
+     * @param string $key 加密密钥
+     * @return string
+     */
+    private static function desDecrypt($content, $key)
+    {
+        $content = base64_decode($content);
+        //使用3des，CBC模式
+        $td = mcrypt_module_open(MCRYPT_3DES, '', MCRYPT_MODE_CBC, '');
+        //开始解密
+        mcrypt_generic_init($td, $key, '88002233');
+        $data = mdecrypt_generic($td, $content);
+        mcrypt_generic_deinit($td);
+        mcrypt_module_close($td);
+        //删除填充
+        $result = str_replace(chr(0), '', $data);
         return $result;
     }
 }

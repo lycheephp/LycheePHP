@@ -45,3 +45,20 @@ function register($module_dir)
 {
     Config::register($module_dir);
 }
+
+/**
+ * 清除*.runtime文件
+ */
+function erase_runtime()
+{
+    $handle = opendir(LYCHEE_RUNTIME);
+    $skip = array('.', '..');
+    while ($file = readdir($handle)) {
+        if (in_array($file, $skip)) {
+            continue;
+        }
+        $file_path = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . $file;
+        @unlink($file_path);
+    }
+    closedir($handle);
+}

@@ -455,7 +455,6 @@ class QueryHelper
     /**
      * set join condition
      * e.g.1: join('tbl_c', array('tbl_a.id', 'tbl_c.id')) // INNER JOIN tbl_c ON tbl_a.id = tbl_c.id
-     * e.g.2: join(array('tbl_c', array('tbl_a.id', 'tbl_c.id'), Operator::JOIN_LEFT) // LEFT JOIN tbl_c ON tbl_a.id = tbl_c.id
      * @param string $tbl_name
      * @param array $condition
      * @param string $type

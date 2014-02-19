@@ -149,7 +149,7 @@ class Archive
      */
     public function getCategoryTree()
     {
-        $list = $this->archive->order('sort')->select();
+        $list = $this->category->order('sort')->select();
         return self::arrangeCategoryTree(0, $list);
     }
 }

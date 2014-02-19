@@ -20,9 +20,9 @@ CREATE TABLE `archive` (
 -- ----------------------------
 DROP TABLE IF EXISTS `archive_category`;
 CREATE TABLE `archive_category` (
-  `cate_id` int(10) unsigned NOT NULL COMMENT '文章分类ID',
+  `cate_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '文章分类ID',
   `parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '父ID',
   `name` varchar(50) NOT NULL COMMENT '分类名称',
   `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
   PRIMARY KEY (`cate_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;

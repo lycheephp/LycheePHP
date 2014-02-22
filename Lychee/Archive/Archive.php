@@ -111,6 +111,26 @@ class Archive
     }
 
     /**
+     * 获取文章列表
+     * @param array $condition
+     * @return array
+     */
+    public function getArchiveList(array $condition = array())
+    {
+        return $this->archive->where($condition)->order(array('update_time', 'add_time', 'sort'))->select();
+    }
+
+    /**
+     * 获取文章总数
+     * @param array $condition
+     * @return int
+     */
+    public function getArchiveCount(array $condition = array())
+    {
+        return $this->archive->where($condition)->count();
+    }
+
+    /**
      * 获取文章分类信息
      * @param int $id
      * @return array

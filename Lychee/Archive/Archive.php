@@ -86,7 +86,7 @@ class Archive
         if ($id < 1) {
             return array();
         }
-        return $this->archive->where(array('archive_id' => $id, 'status' => 1))->select(true);
+        return $this->archive->where(array('archive_id' => $id))->select(true);
     }
 
     /**
@@ -198,6 +198,31 @@ class Archive
     }
 
     /**
+     * 编辑文章
+     * @param array $data
+     * @param $archive_id
+     * @return int
+     */
+    public function editArchive(array $data, $archive_id)
+    {
+        $archive_id = intval($archive_id);
+        if ($archive_id < 1) {
+            return 0;
+        }
+        return $this->archive->data($data)->where(array('archive_id' => $archive_id))->update();
+    }
+
+    /**
+     * 添加文章
+     * @param array $data
+     * @return int
+     */
+    public function addArchive(array $data)
+    {
+        return $this->archive->data($data)->insert();
+    }
+
+    /**
      * 添加文章分类
      * @param array $data
      * @return int
@@ -205,6 +230,20 @@ class Archive
     public function addCategory(array $data)
     {
         return $this->category->data($data)->insert();
+    }
+
+    /**
+     * 删除文章
+     * @param int $archive_id
+     * @return int
+     */
+    public function deleteArchive($archive_id)
+    {
+        $archive_id = intval($archive_id);
+        if ($archive_id < 1) {
+            return 0;
+        }
+        return $this->archive->where(array('archive_id' => $archive_id))->delete();
     }
 
     /**

@@ -233,6 +233,36 @@ class Archive
     }
 
     /**
+     * 审核通过文章
+     * @param int $archive_id
+     * @return int
+     */
+    public function passArchive($archive_id)
+    {
+        $archive_id = intval($archive_id);
+        if ($archive_id < 1) {
+            return 0;
+        }
+        //设置状态为1
+        return $this->archive->where(array('archive_id' => $archive_id))->data(array('status' => 1))->update();
+    }
+
+    /**
+     * 待审核or审核不通过文章
+     * @param int $archive_id
+     * @return int
+     */
+    public function unpassArchive($archive_id)
+    {
+        $archive_id = intval($archive_id);
+        if ($archive_id < 1) {
+            return 0;
+        }
+        //设置状态为0
+        return $this->archive->where(array('archive_id' => $archive_id))->data(array('status' => 0))->update();
+    }
+
+    /**
      * 删除文章
      * @param int $archive_id
      * @return int
@@ -243,7 +273,23 @@ class Archive
         if ($archive_id < 1) {
             return 0;
         }
-        return $this->archive->where(array('archive_id' => $archive_id))->delete();
+        // 设置状态为2
+        return $this->archive->where(array('archive_id' => $archive_id))->data(array('status' => 2))->update();
+    }
+
+    /**
+     * 恢复文章
+     * @param int $archive_id
+     * @return int
+     */
+    public function recoverArchive($archive_id)
+    {
+        $archive_id = intval($archive_id);
+        if ($archive_id < 1) {
+            return 0;
+        }
+        //设置状态为0
+        return $this->archive->where(array('archive_id' => $archive_id))->data(array('status' => 0))->update();
     }
 
     /**

@@ -49,7 +49,7 @@ class Attachment
     public function __construct()
     {
         $db_name = Config::get('attachment.mysql.db_name');
-        $this->image_albumn = new QueryHelper('attachment_image_albumn', $db_name);
+        $this->image_albumn = new QueryHelper('atttachment_albumn', $db_name);
         $this->image = new QueryHelper('attachment_image', $db_name);
         $this->file = new QueryHelper('attachment_file', $db_name);
     }
@@ -217,7 +217,7 @@ class Attachment
         if ($id < 1) {
             return array();
         }
-        return $this->file->where(array('file_id' => $id, 'status' => 1))->select(true);
+        return $this->file->where(array('file_id' => $id))->select(true);
     }
 
     /**
@@ -231,23 +231,6 @@ class Attachment
         if ($id < 1) {
             return array();
         }
-        return $this->image->where(array('image_id' => $id, 'status' => 1))->select(true);
-    }
-
-    /**
-     * 获取指定相册图片列表
-     * @param int $id
-     * @param int $offset
-     * @param int $limit
-     * @return array
-     */
-    public function getAlbumnImageList($id, $offset, $limit)
-    {
-        $id = intval($id);
-        if ($id < 1) {
-            return array();
-        }
-        return $this->image_albumn->where(array('albumn_id' => $id, 'status' => 1))->order(array('sort', 'sort'))
-            ->limit($limit, $offset)->select();
+        return $this->image->where(array('image_id' => $id))->select(true);
     }
 }

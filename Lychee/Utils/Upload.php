@@ -124,11 +124,11 @@ class Upload
         if (empty($file_name)) {
             $file_name = $this->client_side_filename;
         }
-        if (!is_dir($save_path)) {
-            $save_path = dirname($save_path);
-        }
         if (!file_exists($save_path)) {
             mkdir($save_path, 0777, true);
+        }
+        if (!is_dir($save_path)) {
+            $save_path = dirname($save_path);
         }
         $target = $save_path . DIRECTORY_SEPARATOR . $file_name;
         if ($is_cut) {
@@ -214,6 +214,15 @@ class Upload
     public function getServerSideFilename()
     {
         return pathinfo($this->server_side_filename, PATHINFO_FILENAME);
+    }
+
+    /**
+     * return file extension
+     * @return string
+     */
+    public function getServerSideExtension()
+    {
+        return pathinfo($this->client_side_filename, PATHINFO_EXTENSION);
     }
 
     /**

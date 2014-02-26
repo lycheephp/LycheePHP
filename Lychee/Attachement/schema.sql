@@ -18,7 +18,7 @@ CREATE TABLE `attachment_file` (
 DROP TABLE IF EXISTS `attachment_image`;
 CREATE TABLE `attachment_image` (
   `image_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `albumn_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '相册id',
+  `album_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '相册id',
   `path` varchar(255) NOT NULL COMMENT '图片路径',
   `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
   `add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
@@ -26,11 +26,11 @@ CREATE TABLE `attachment_image` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for atttachment_albumn
+-- Table structure for atttachment_album
 -- ----------------------------
-DROP TABLE IF EXISTS `atttachment_albumn`;
-CREATE TABLE `atttachment_albumn` (
-  `albumn_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '相册ID',
+DROP TABLE IF EXISTS `atttachment_album`;
+CREATE TABLE `atttachment_album` (
+  `album_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '相册ID',
   `module_name` varchar(255) NOT NULL DEFAULT '' COMMENT '相册所属模块',
   `module_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '相册所属模块ID',
   `name` varchar(100) NOT NULL COMMENT '相册名称',

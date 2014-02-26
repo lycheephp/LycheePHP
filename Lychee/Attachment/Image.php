@@ -18,24 +18,18 @@ use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
 
 /**
- * 附件模块逻辑类
+ * 附件模块图片逻辑类
  * @author Samding
  * @package Lychee\Attachment
  */
-class Attachment
+class Image
 {
 
     /**
      * 图片相册表查询类
      * @var QueryHelper
      */
-    private $image_albumn;
-
-    /**
-     * 文件表查询类
-     * @var QueryHelper
-     */
-    private $file;
+    private $album;
 
     /**
      * 图片表查询类
@@ -49,9 +43,8 @@ class Attachment
     public function __construct()
     {
         $db_name = Config::get('attachment.mysql.db_name');
-        $this->image_albumn = new QueryHelper('atttachment_albumn', $db_name);
+        $this->album = new QueryHelper('attachment_album', $db_name);
         $this->image = new QueryHelper('attachment_image', $db_name);
-        $this->file = new QueryHelper('attachment_file', $db_name);
     }
 
     /**
@@ -59,9 +52,9 @@ class Attachment
      * @param array $data
      * @return int
      */
-    public function addAlbumn(array $data)
+    public function addAlbum(array $data)
     {
-        return $this->image_albumn->data($data)->insert();
+        return $this->album->data($data)->insert();
     }
 
     /**
@@ -70,13 +63,13 @@ class Attachment
      * @param int $id
      * @return int
      */
-    public function editAlbumn(array $data, $id)
+    public function editAlbum(array $data, $id)
     {
         $id = intval($id);
         if ($id < 1) {
             return 0;
         }
-        return $this->image_albumn->data($data)->where(array('albumn_id' => $id))->update();
+        return $this->album->data($data)->where(array('album_id' => $id))->update();
     }
 
     /**
@@ -84,13 +77,15 @@ class Attachment
      * @param int $id
      * @return int
      */
-    public function removeAlbumn($id)
+    public function removeAlbum($id)
     {
         $id = intval($id);
         if ($id < 1) {
             return 0;
         }
-        return $this->image_albumn->data(array('status' => 0))->where(array('albumn_id' => $id))->update();
+        $condition = array('album_id' => $id);
+        $this->image->where($condition)->delete();
+        return $this->album->where($condition)->delete();
     }
 
     /**
@@ -129,67 +124,7 @@ class Attachment
         if ($id < 1) {
             return 0;
         }
-        return $this->image->where(array('image_id' => $id))->data(array('status' => 0))->update();
-    }
-
-    /**
-     * 添加文件
-     * @param array $data
-     * @return int
-     */
-    public function addFile(array $data)
-    {
-        return $this->file->data($data)->insert();
-    }
-
-    /**
-     * 编辑文件
-     * @param array $data
-     * @param int $id
-     * @return int
-     */
-    public function editFile(array $data, $id)
-    {
-        $id = intval($id);
-        if ($id < 1) {
-            return 0;
-        }
-        return $this->file->data($data)->where(array('file_id' => $id))->update();
-    }
-
-    /**
-     * 移除文件
-     * @param int $id
-     * @return int
-     */
-    public function removeFile($id)
-    {
-        $id = intval($id);
-        if ($id < 1) {
-            return 0;
-        }
-        return $this->file->data(array('status' => 0))->where(array('file_id' => $id))->update();
-    }
-
-    /**
-     * 开始下载文件
-     * @param int $id
-     */
-    public function download($id)
-    {
-        $info = $this->getFileInfo($id);
-        if (empty($info)) {
-            return;
-        }
-        $file = $info['path'];
-        if (!file_exists($file)) {
-            return;
-        }
-        header('Content-Disposition: attachment;filename=' . $file);
-        $handle = fopen($file, 'r');
-        while ($buffer = fgets($handle, 512)) {
-            echo $buffer;
-        }
+        return $this->image->where(array('image_id' => $id))->delete();
     }
 
     /**
@@ -197,27 +132,13 @@ class Attachment
      * @param int $id
      * @return array
      */
-    public function getAlbumnInfo($id)
+    public function getAlbumInfo($id)
     {
         $id = intval($id);
         if ($id < 1) {
             return array();
         }
-        return $this->image_albumn->where(array('albumn_id' => $id, 'status' => 1))->select(true);
-    }
-
-    /**
-     * 获取文件信息
-     * @param int $id
-     * @return array
-     */
-    public function getFileInfo($id)
-    {
-        $id = intval($id);
-        if ($id < 1) {
-            return array();
-        }
-        return $this->file->where(array('file_id' => $id))->select(true);
+        return $this->album->where(array('album_id' => $id))->select(true);
     }
 
     /**

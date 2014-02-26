@@ -7,6 +7,7 @@ CREATE TABLE `archive` (
   `cate_id` int(10) unsigned NOT NULL COMMENT '文章分类ID',
   `title` varchar(100) NOT NULL COMMENT '文章标题',
   `author` varchar(50) NOT NULL COMMENT '作者',
+  `cover` varchar(255) NOT NULL COMMENT '封面图',
   `content` text NOT NULL COMMENT '文章内容',
   `click` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '点击数',
   `add_time` int(10) unsigned NOT NULL COMMENT '添加时间',

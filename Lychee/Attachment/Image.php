@@ -187,4 +187,38 @@ class Image
         return $this->image->data($data)->insert();
     }
 
+    /**
+     * 对指定模块添加图片
+     * @param array $data
+     * @param string $module_name
+     * @param int $module_id
+     * @return int
+     */
+    public function addModuleImage(array $image_data, $module_name, $module_id)
+    {
+        $module_name = trim($module_name);
+        $module_id = intval($module_id);
+        if (empty($module_name)) {
+            return 0;
+        }
+        if ($module_id < 1) {
+            return 0;
+        }
+        $album_info = $this->album->where(array('module_name' => $module_name, 'module_id' => $module_id))->select(true);
+        if (empty($album_info)) {
+            $data = array();
+            $data['module_name'] = $module_name;
+            $data['module_id'] = $module_id;
+            $data['name'] = '';
+            $data['desc'] = '';
+            $data['sort'] = 0;
+            $data['add_time'] = time();
+            $album_id = $this->album->data($data)->insert();
+        }
+        else {
+            $album_id = $album_info['album_id'];
+        }
+        $image_data['album_id'] = $album_id;
+        return $this->image->data($image_data)->insert();
+    }
 }

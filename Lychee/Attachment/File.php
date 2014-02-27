@@ -113,4 +113,20 @@ class File
         }
         return $this->file->where(array('file_id' => $id))->select(true);
     }
+
+    /**
+     * @param array $data
+     * @param string $module_name
+     * @return int
+     */
+    public function addDefaultFile(array $data, $module_name)
+    {
+        $module_name = trim($module_name);
+        if (empty($module_name)) {
+            return 0;
+        }
+        $data['module_name'] = $module_name;
+        $data['module_id'] = 0;
+        return $this->file->data($data)->insert();
+    }
 }

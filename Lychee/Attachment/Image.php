@@ -154,4 +154,37 @@ class Image
         }
         return $this->image->where(array('image_id' => $id))->select(true);
     }
+
+    /**
+     * 获取模块默认相册
+     * @param string $module_name
+     * @return array()
+     */
+    public function getDefaultAlbumInfo($module_name)
+    {
+        $module_name = trim($module_name);
+        if (empty($module_name)) {
+            return array();
+        }
+        $condition = array('module_name' => $module_name, 'module_id' => 0);
+        return $this->album->where($condition)->select(true);
+    }
+
+    /**
+     * 添加图片至默认模块
+     * @param array $data
+     * @param string $module_name
+     * @return int
+     */
+    public function addDefaultImage(array $data, $module_name)
+    {
+        $album_info = $this->getDefaultAlbumInfo($module_name);
+        if (empty($album_info)) {
+            return 0;
+        }
+        $album_id = $album_info['album_id'];
+        $data['album_id'] = $album_id;
+        return $this->image->data($data)->insert();
+    }
+
 }

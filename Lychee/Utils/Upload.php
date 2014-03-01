@@ -117,12 +117,12 @@ class Upload
      * @param string $save_path
      * @param string $file_name
      * @param bool $is_cut
-     * @return bool
+     * @return string
      */
     public function save($save_path, $file_name = '', $is_cut=false)
     {
         if (empty($file_name)) {
-            $file_name = $this->client_side_filename;
+            $file_name = uniqid() . '.' . $this->getServerSideExtension();//random file name
         }
         if (!file_exists($save_path)) {
             mkdir($save_path, 0777, true);
@@ -132,12 +132,12 @@ class Upload
         }
         $target = $save_path . DIRECTORY_SEPARATOR . $file_name;
         if ($is_cut) {
-            $flag = move_uploaded_file($this->server_side_filename, $target);
+            move_uploaded_file($this->server_side_filename, $target);
         }
         else {
-            $flag = copy($this->server_side_filename, $target);
+            copy($this->server_side_filename, $target);
         }
-        return $flag;
+        return $file_name;
     }
 
     /**

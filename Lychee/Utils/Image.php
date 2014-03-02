@@ -104,7 +104,8 @@ class Image {
      * @throws \Exception
      * @param string $file_path
      */
-    public function __construct($file_path) {
+    public function __construct($file_path)
+    {
         if (!file_exists($file_path)) {
             throw new \Exception('file not exist');
         }
@@ -140,7 +141,8 @@ class Image {
      * @param string $file_path
      * @return bool
      */
-    public static function isImage($file_path) {
+    public static function isImage($file_path)
+    {
         if (file_exists($file_path)) {
             $flag = exif_imagetype($file_path);
             return $flag !== false;
@@ -151,12 +153,13 @@ class Image {
     /**
      * detect image type
      * @param string $file_path
-     * @return int|bool
+     * @return int
      */
-    public static function getImageType($file_path) {
+    public static function getImageType($file_path)
+    {
+        $result = false;
         if (self::isImage($file_path)) {
             $type = exif_imagetype($file_path);
-            $result = false;
             if ($type == IMAGETYPE_BMP) {
                 $result = self::TYPE_BMP;
             }
@@ -169,9 +172,8 @@ class Image {
             elseif ($type == IMAGETYPE_GIF) {
                 $result = self::TYPE_GIF;
             }
-            return $result;
         }
-        return false;
+        return $result;
     }
 
     /**
@@ -179,7 +181,8 @@ class Image {
      * @param int $degree clockwise rotate degree
      * @return Image
      */
-    public function rotate($degree) {
+    public function rotate($degree)
+    {
         $degree = intval($degree);
         if ($degree < 0) {
             if ($degree < -360) {
@@ -203,7 +206,8 @@ class Image {
      * @param bool $is_y base on Y Axis instead of X Axis
      * @return Image
      */
-    public function flip($is_y = false) {
+    public function flip($is_y = false)
+    {
         $width = imagesx($this->image_handle);
         $height = imagesy($this->image_handle);
         $target_handle = imagecreatetruecolor($width, $height);
@@ -232,7 +236,8 @@ class Image {
      * @param int $y_offset
      * @return Image
      */
-    public function watermark($watermark_path, $pos = self::POS_TOP_LEFT, $x_offset = 0, $y_offset = 0) {
+    public function watermark($watermark_path, $pos = self::POS_TOP_LEFT, $x_offset = 0, $y_offset = 0)
+    {
         // read watermark file
         if (!file_exists($watermark_path)) {
             throw new \Exception('watermark file not exist', 1);
@@ -303,7 +308,8 @@ class Image {
      * @param bool $keep_scale
      * @return Image
      */
-    public function resize($width, $height, $keep_scale = true) {
+    public function resize($width, $height, $keep_scale = true)
+    {
         $source_width = imagesx($this->image_handle);//宽度
         $source_height = imagesy($this->image_handle);//高度
 
@@ -327,23 +333,32 @@ class Image {
 
     /**
      * save image file
-     * support jpg and png
      * @throws \Exception
      * @param string $path
      * @param string $file_name
      * @param int $type
      * @return Image
      */
-    public function save($path, $file_name, $type = self::TYPE_PNG) {
+    public function save($path, $file_name, $type = 0)
+    {
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
         $save_path = $path . '/' . $file_name;
+        if (empty($type)) {
+            $type = self::getImageType($this->image_path);
+        }
         if ($type == self::TYPE_JPEG) {
             imagejpeg($this->image_handle, $save_path, 85);
         }
         elseif ($type == self::TYPE_PNG) {
             imagepng($this->image_handle, $save_path);
+        }
+        elseif ($type == self::TYPE_GIF) {
+            imagegif($this->image_handle, $save_path);
+        }
+        elseif ($type == self::TYPE_BMP) {
+            imagejpeg($this->image_handle, $save_path, 85);
         }
         else {
             throw new \Exception('unsupported file type');
@@ -354,7 +369,8 @@ class Image {
     /**
      * output captcha
      */
-    public function display() {
+    public function display()
+    {
         header("Content-type: image/png");
         imagepng($this->image_handle);
     }
@@ -362,7 +378,8 @@ class Image {
     /**
      * destructor
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         if (is_resource($this->image_handle)) {
             imagedestroy($this->image_handle);
         }

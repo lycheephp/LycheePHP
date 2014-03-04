@@ -16,6 +16,37 @@ PHP开源组件
 
 主要包含数据库连接封装,数据查询的助手类以及一个简单文件日志类
 
+### 安装
+
+示例配置
+
+```php
+$config = array(
+    //数据库配置
+    'mysql' => array(
+        'host' => '127.0.0.1',
+        'port' => 3306,
+        'username' => '数据库帐号',
+        'password' =>  '数据库密码',
+        'db_name' => 'test',
+        'charset' => 'utf8',
+    ),
+
+    //日志配置
+    'logger' => array(
+        'log_dir' => LA_ROOT . '/data/log',
+    ),
+);
+```
+
+加载
+
+```php
+require '你放置的路径/Lychee.php';
+include '上述配置.php'
+Lychee\init($config);//完成
+```
+
 ### MySQL数据库相关示例
 
 假设有如下数据表:

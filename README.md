@@ -139,3 +139,10 @@ $ar->query($sql);
 $sql = "INSERT INTO `test`.`test` (name, status) VALUES ('misha', 2)"
 $ar->execute($sql);
 ```
+
+### 文件日志相关记录
+
+```php
+$log = new Logger();
+$log->log(Logger::DEBUG, $message, $context);
+```

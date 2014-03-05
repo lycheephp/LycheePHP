@@ -140,9 +140,72 @@ $sql = "INSERT INTO `test`.`test` (name, status) VALUES ('misha', 2)"
 $ar->execute($sql);
 ```
 
-### 文件日志相关记录
+### 文件日志
 
 ```php
 $log = new Logger();
 $log->log(Logger::DEBUG, $message, $context);
+```
+
+### 验证码助手
+
+```PHP
+//page 1
+use Lychee\Utils as Utils;
+
+$captcha = new Utils\Captcha();
+$captcha->display();
+
+//page 2
+use Lychee\Utils as Utils;
+$flag = Utils\Captcha::check($value); //true or false
+```
+
+### 验证助手
+
+```PHP
+Utils\Validation::isMobile('43723458873'); // false
+Utils\Validation::isIP('127.0.0.1'); // true
+Utils\Validation::isIP('256.367.234.192'); // false
+Utils\Validation::isURL('163.com'); // true
+// etc...
+```
+
+### 图片助手
+
+```PHP
+use Lychee\Utils as Utils;
+
+$image = '/home/abc.png';
+Utils\Image::isImage($image); // true
+Utils\Image::getImageType($image) == Utils\Image::TYPE_PNG // true
+$obj = new Utils\Image($image);
+$obj->rotate(90)->resize(400, 500)->flip()->save($path, $filename);
+$obj->display(); // directly output
+```
+
+### 上传助手
+
+```HTML
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="myfile" />
+    <button type="submit">OK</button>
+</form>
+```
+
+```PHP
+use Lychee\Utils as Utils;
+
+$upload = new Utils\Upload('myfile');
+if ($upload->isSuccess()) {
+    if ($upload->isImage()) {
+        $upload->save($target_dir, $filename);
+    }
+    else {
+        // invalid file type
+    }
+}
+else {
+    // upload fail
+}
 ```

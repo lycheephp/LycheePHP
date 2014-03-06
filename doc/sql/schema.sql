@@ -256,3 +256,15 @@ CREATE TABLE `goods_category` (
   `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
   PRIMARY KEY (`cate_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for goods_attribute
+-- ----------------------------
+DROP TABLE IF EXISTS `goods_attribute`;
+CREATE TABLE `goods_attribute` (
+  `attr_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '属性ID',
+  `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID',
+  `name` varchar(50) NOT NULL COMMENT '属性名',
+  `value` varchar(50) NOT NULL COMMENT '属性值',
+  PRIMARY KEY (`attr_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

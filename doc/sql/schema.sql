@@ -223,3 +223,48 @@ CREATE TABLE `attachment_image` (
 -- ----------------------------
 -- Records of attachment_image
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for goods
+-- ----------------------------
+DROP TABLE IF EXISTS `goods`;
+CREATE TABLE `goods` (
+  `goods_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `cate_id` int(10) unsigned NOT NULL COMMENT '分类ID',
+  `name` varchar(100) NOT NULL COMMENT '商品名称',
+  `cover` varchar(255) NOT NULL DEFAULT '' COMMENT '封面图',
+  `click` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '点击数',
+  `cost_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '成本价',
+  `net_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '净价',
+  `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '售价',
+  `short_desc` varchar(255) NOT NULL DEFAULT '' COMMENT '短介绍',
+  `desc` text NOT NULL COMMENT '商品介绍',
+  `add_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0:下架 1:上架',
+  PRIMARY KEY (`goods_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for goods_category
+-- ----------------------------
+DROP TABLE IF EXISTS `goods_category`;
+CREATE TABLE `goods_category` (
+  `cate_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '分类ID',
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '父分类ID',
+  `name` varchar(50) NOT NULL COMMENT '分类名称',
+  `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
+  PRIMARY KEY (`cate_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for goods_attribute
+-- ----------------------------
+DROP TABLE IF EXISTS `goods_attribute`;
+CREATE TABLE `goods_attribute` (
+  `attr_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '属性ID',
+  `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID',
+  `name` varchar(50) NOT NULL COMMENT '属性名',
+  `value` varchar(50) NOT NULL COMMENT '属性值',
+  PRIMARY KEY (`attr_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

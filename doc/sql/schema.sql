@@ -244,12 +244,14 @@ CREATE TABLE `goods` (
   `add_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0:下架 1:上架',
+  `sort` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排序降序',
   PRIMARY KEY (`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
+
 
 -- ----------------------------
 -- Table structure for goods_category

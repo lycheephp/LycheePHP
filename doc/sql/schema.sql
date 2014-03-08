@@ -234,6 +234,8 @@ CREATE TABLE `goods` (
   `name` varchar(100) NOT NULL COMMENT '商品名称',
   `cover` varchar(255) NOT NULL DEFAULT '' COMMENT '封面图',
   `click` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '点击数',
+  `unlimited_stock` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '无限库存 0:否 1:是',
+  `stock` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '库存',
   `cost_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '成本价',
   `net_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '净价',
   `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '售价',
@@ -244,6 +246,10 @@ CREATE TABLE `goods` (
   `status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0:下架 1:上架',
   PRIMARY KEY (`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of goods
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for goods_category
@@ -268,3 +274,29 @@ CREATE TABLE `goods_attribute` (
   `value` varchar(50) NOT NULL COMMENT '属性值',
   PRIMARY KEY (`attr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for order
+-- ----------------------------
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE `order` (
+  `order_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(255) NOT NULL COMMENT '订单号',
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单用户ID',
+  `zip` varchar(50) NOT NULL DEFAULT '' COMMENT '订单邮编',
+  `mobile` varchar(20) NOT NULL DEFAULT '' COMMENT '订单联系方式',
+  `city_id` int(10) NOT NULL DEFAULT '0' COMMENT '送货城市ID',
+  `address` varchar(255) NOT NULL DEFAULT '' COMMENT '订单地址',
+  `cost_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单成本价',
+  `total_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单总价',
+  `strike_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单成交价',
+  `shipping_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '运费',
+  `add_time` int(10) unsigned NOT NULL COMMENT '订单添加时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单更新时间',
+  `status` tinyint(3) unsigned NOT NULL COMMENT '订单状态 0:订单建立 1:用户确认 2:支付完成 3:处理完毕',
+  PRIMARY KEY (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order
+-- ----------------------------

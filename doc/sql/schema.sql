@@ -234,6 +234,8 @@ CREATE TABLE `goods` (
   `name` varchar(100) NOT NULL COMMENT '商品名称',
   `cover` varchar(255) NOT NULL DEFAULT '' COMMENT '封面图',
   `click` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '点击数',
+  `unlimited_stock` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '无限库存 0:否 1:是',
+  `stock` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '库存',
   `cost_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '成本价',
   `net_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '净价',
   `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '售价',
@@ -244,6 +246,10 @@ CREATE TABLE `goods` (
   `status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0:下架 1:上架',
   PRIMARY KEY (`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of goods
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for goods_category

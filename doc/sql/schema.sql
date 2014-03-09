@@ -304,20 +304,20 @@ CREATE TABLE `order` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for order_detail
+-- Table structure for order_goods
 -- ----------------------------
-DROP TABLE IF EXISTS `order_detail`;
-CREATE TABLE `order_detail` (
-  `detail_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `order_goods`;
+CREATE TABLE `order_goods` (
   `order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
   `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID',
   `num` int(10) unsigned NOT NULL COMMENT '商品数量',
   `cost_price` decimal(10,2) unsigned NOT NULL COMMENT '商品成本单价',
   `net_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '商品净单价价',
   `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '商品售单价价',
-  PRIMARY KEY (`detail_id`)
+  `strike_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '产品成交单价',
+  PRIMARY KEY (`order_id`,`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of order_detail
+-- Records of order_goods
 -- ----------------------------

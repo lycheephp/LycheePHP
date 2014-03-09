@@ -25,4 +25,20 @@ use Lychee\Base\MySQL\QueryHelper as QueryHelper;
 interface InterfaceHandler
 {
 
+    public function onBeforeCreate();
+
+    public function onAfterCreate();
+
+    public function onBeforeConfirm();
+
+    public function onAfterConfirm();
+
+    public function onBeforePay();
+
+    public function onAfterPay();
+
+    public function onBeforeComplete();
+
+    public function onAfterComplete();
+
 }

@@ -284,6 +284,7 @@ DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order` (
   `order_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `order_no` varchar(255) NOT NULL COMMENT '订单号',
+  `type_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单类型',
   `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单用户ID',
   `zip` varchar(50) NOT NULL DEFAULT '' COMMENT '订单邮编',
   `mobile` varchar(20) NOT NULL DEFAULT '' COMMENT '订单联系方式',

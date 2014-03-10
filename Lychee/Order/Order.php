@@ -26,11 +26,6 @@ class Order
 {
 
     /**
-     * 订单建立前
-     */
-    const BEFORE_CREATE = 'before_create';
-
-    /**
      * 订单建立后
      */
     const AFTER_CREATE = 'after_create';
@@ -64,6 +59,12 @@ class Order
      * 订单完成后
      */
     const AFTER_COMPLETE = 'after_complete';
+
+    /**
+     * 事件钩子
+     * @var array
+     */
+    private $hooks = array();
 
     /**
      * 订单表查询类
@@ -108,7 +109,12 @@ class Order
      */
     public function getOrderGoodsInfo($order_id)
     {
-        //todo
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return array();
+        }
+        $order_info = $this->order->where(array('order_id' => $order_id))->select(true);
+        return $order_info;
     }
 
     /**
@@ -118,7 +124,7 @@ class Order
      */
     public function getOrderList(array $condition = array())
     {
-        //TODO
+        return $this->order->where($condition)->select();
     }
 
     /**
@@ -128,7 +134,7 @@ class Order
      */
     public function getOrderCount(array $condition = array())
     {
-
+        return $this->order->where($condition)->count();
     }
 
     /**
@@ -149,33 +155,83 @@ class Order
 
     /**
      * 删除订单
+     * @param int $order_id
+     * @return int
      */
-    public function deleteOrder()
+    public function cancelOrder($order_id)
     {
-
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return 0;
+        }
+        return $this->order->where(array('order_id' => $order_id))->data(array('status' => -1))->update();
     }
 
     /**
      * 初始化订单钩子
+     * @param $hooks
      */
-    public function initHooks()
+    public function initHooks(array $hooks)
     {
-
+        if (!empty($this->hooks)) {
+            $this->hooks = $hooks;
+        }
     }
 
     /**
-     * 绑定订单钩子
+     * 添加订单钩子
+     * @param int $type
+     * @param string $class
      */
-    public function bindHooks()
+    public function addHook($type, $class)
     {
+        $this->hooks[$type] = $class;
+    }
 
+    /**
+     * 添加订单钩子设置
+     * @param array $hooks
+     */
+    public function appendHooks(array $hooks)
+    {
+        foreach ($hooks as $type => $class) {
+            $this->addHook($type, $class);
+        }
     }
 
     /**
      * 触发订单事件
+     * @param int $order_id
+     * @param string $type
+     * @return bool
      */
-    public function trigger()
+    public function trigger($order_id, $type)
     {
-
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return false;
+        }
+        $order_info = $this->order->where(array('order_id' => $order_id))->field('type_id')->select(true);
+        if (empty($order_info)) {
+            return false;
+        }
+        $type_id = $order_info['type_id'];
+        if (!isset($this->hooks[$type_id])) {
+            //没有该订单类型的事件处理器绑定
+            return true;
+        }
+        $class_name = $this->hooks[$type_id];
+        $class = new \ReflectionClass($class_name);
+        $instance = $class->newInstance();
+        if (!$instance instanceof InterfaceHandler) {
+            return false; //不正确的绑定类
+        }
+        //根据事件类型获取方法名
+        $type = trim($type);
+        $type = str_replace('_', ' ', $type);
+        $type = ucwords($type);
+        $method_name = 'on' . str_replace(' ', '_', $type);
+        $method = new \ReflectionMethod($class_name, $method_name);
+        return $method->invokeArgs($instance, array($order_id));
     }
 }

@@ -61,6 +61,12 @@ class Order
     const AFTER_COMPLETE = 'after_complete';
 
     /**
+     * 事件钩子
+     * @var array
+     */
+    private $hooks = array();
+
+    /**
      * 订单表查询类
      * @var QueryHelper
      */
@@ -152,18 +158,34 @@ class Order
 
     /**
      * 初始化订单钩子
+     * @param $hooks
      */
-    public function initHooks()
+    public function initHooks(array $hooks)
     {
-
+        if (!empty($this->hooks)) {
+            $this->hooks = $hooks;
+        }
     }
 
     /**
-     * 绑定订单钩子
+     * 添加订单钩子
+     * @param int $type
+     * @param string $class
      */
-    public function bindHooks()
+    public function addHook($type, $class)
     {
+        $this->hooks[$type] = $class;
+    }
 
+    /**
+     * 添加订单钩子设置
+     * @param array $hooks
+     */
+    public function appendHooks(array $hooks)
+    {
+        foreach ($hooks as $type => $class) {
+            $this->addHook($type, $class);
+        }
     }
 
     /**
@@ -178,6 +200,27 @@ class Order
         if ($order_id < 1) {
             return false;
         }
-        $order_info = $this->order->where(array('order_id' => $order_id))->field('order_type')->select(true);
+        $order_info = $this->order->where(array('order_id' => $order_id))->field('type_id')->select(true);
+        if (empty($order_info)) {
+            return false;
+        }
+        $type_id = $order_info['type_id'];
+        if (!isset($this->hooks[$type_id])) {
+            //没有该订单类型的事件处理器绑定
+            return true;
+        }
+        $class_name = $this->hooks[$type_id];
+        $class = new \ReflectionClass($class_name);
+        $instance = $class->newInstance();
+        if (!$instance instanceof InterfaceHandler) {
+            return false; //不正确的绑定类
+        }
+        //根据事件类型获取方法名
+        $type = trim($type);
+        $type = str_replace('_', ' ', $type);
+        $type = ucwords($type);
+        $method_name = 'on' . str_replace(' ', '_', $type);
+        $method = new \ReflectionMethod($class_name, $method_name);
+        return $method->invokeArgs($instance, array($order_id));
     }
 }

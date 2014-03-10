@@ -14,9 +14,6 @@
  */
 namespace Lychee\Order;
 
-use Lychee\Config as Config;
-use Lychee\Base\MySQL\QueryHelper as QueryHelper;
-
 /**
  * 订单钩子处理器接口
  * @author Samding
@@ -25,20 +22,59 @@ use Lychee\Base\MySQL\QueryHelper as QueryHelper;
 interface InterfaceHandler
 {
 
+    /**
+     * 订单创建前触发
+     * @return bool
+     */
     public function onBeforeCreate();
 
-    public function onAfterCreate();
+    /**
+     * 订单创建后触发
+     * @param int $order_id
+     * @return bool
+     */
+    public function onAfterCreate($order_id);
 
-    public function onBeforeConfirm();
+    /**
+     * 订单确认前触发
+     * @param int $order_id
+     * @return bool
+     */
+    public function onBeforeConfirm($order_id);
 
-    public function onAfterConfirm();
+    /**
+     * 订单确认后触发
+     * @param int $order_id
+     * @return bool
+     */
+    public function onAfterConfirm($order_id);
 
-    public function onBeforePay();
+    /**
+     * 订单支付前触发
+     * @param int $order_id
+     * @return bool
+     */
+    public function onBeforePay($order_id);
 
-    public function onAfterPay();
+    /**
+     * 订单支付后出发
+     * @param int $order_id
+     * @return bool
+     */
+    public function onAfterPay($order_id);
 
-    public function onBeforeComplete();
+    /**
+     * 订单完成前触发
+     * @param int $order_id
+     * @return bool
+     */
+    public function onBeforeComplete($order_id);
 
-    public function onAfterComplete();
+    /**
+     * 订单完成后触发
+     * @param int $order_id
+     * @return bool
+     */
+    public function onAfterComplete($order_id);
 
 }

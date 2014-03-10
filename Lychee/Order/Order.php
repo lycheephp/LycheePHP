@@ -26,11 +26,6 @@ class Order
 {
 
     /**
-     * 订单建立前
-     */
-    const BEFORE_CREATE = 'before_create';
-
-    /**
      * 订单建立后
      */
     const AFTER_CREATE = 'after_create';
@@ -173,9 +168,16 @@ class Order
 
     /**
      * 触发订单事件
+     * @param int $order_id
+     * @param string $type
+     * @return bool
      */
-    public function trigger()
+    public function trigger($order_id, $type)
     {
-
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return false;
+        }
+        $order_info = $this->order->where(array('order_id' => $order_id))->field('order_type')->select(true);
     }
 }

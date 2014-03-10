@@ -23,12 +23,6 @@ interface InterfaceHandler
 {
 
     /**
-     * 订单创建前触发
-     * @return bool
-     */
-    public function onBeforeCreate();
-
-    /**
      * 订单创建后触发
      * @param int $order_id
      * @return bool

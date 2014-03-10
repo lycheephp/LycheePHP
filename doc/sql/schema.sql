@@ -296,7 +296,7 @@ CREATE TABLE `order` (
   `shipping_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '运费',
   `add_time` int(10) unsigned NOT NULL COMMENT '订单添加时间',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单更新时间',
-  `status` tinyint(3) unsigned NOT NULL COMMENT '订单状态 0:订单建立 1:用户确认 2:支付完成 3:处理完毕',
+  `status` tinyint(3) unsigned NOT NULL COMMENT '订单状态 -1:取消 0:订单建立 1:用户确认 2:支付完成 3:处理完毕',
   PRIMARY KEY (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -109,7 +109,12 @@ class Order
      */
     public function getOrderGoodsInfo($order_id)
     {
-        //todo
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return array();
+        }
+        $order_info = $this->order->where(array('order_id' => $order_id))->select(true);
+        return $order_info;
     }
 
     /**
@@ -119,7 +124,7 @@ class Order
      */
     public function getOrderList(array $condition = array())
     {
-        //TODO
+        return $this->order->where($condition)->select();
     }
 
     /**
@@ -129,7 +134,7 @@ class Order
      */
     public function getOrderCount(array $condition = array())
     {
-
+        return $this->order->where($condition)->count();
     }
 
     /**
@@ -150,10 +155,16 @@ class Order
 
     /**
      * 删除订单
+     * @param int $order_id
+     * @return int
      */
-    public function deleteOrder()
+    public function cancelOrder($order_id)
     {
-
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return 0;
+        }
+        return $this->order->where(array('order_id' => $order_id))->data(array('status' => -1))->update();
     }
 
     /**

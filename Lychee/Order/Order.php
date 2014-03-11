@@ -16,6 +16,7 @@ namespace Lychee\Order;
 
 use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
+use Lychee\Goods\Goods as Goods;
 
 /**
  * 订单模块逻辑类
@@ -138,12 +139,152 @@ class Order
     }
 
     /**
-     * 创建订单
+     * 生成订单号码
+     * @return string
      */
-    public function createOrder()
+    private static  function generateOrderNo()
+    {
+        return date('YmdHis') . mt_rand(0, 9) . uniqid();
+    }
+
+    /**
+     * 创建订单
+     * @param array $order_info 订单信息
+     * @param array $goods_info 商品信息 array('goods_id' => 'num', ...)
+     * @return int
+     */
+    public function createOrder(array $order_info, array $goods_info)
+    {
+        if (empty($order_info) || empty($goods_info)) {
+            return 0;
+        }
+        //整理订单信息
+        $order_no = isset($order_info['order_no'])?$order_info['order_no']:self::generateOrderNo();
+        $type_id = isset($order_info['type_id'])?intval($order_info['type_id']):0;
+        $user_id = isset($order_info['user_id'])?intval($order_info['user_id']):0;
+        $zip = isset($order_info['zip'])?trim($order_info['zip']):'';
+        $mobile = isset($order_info['mobile'])?trim($order_info['mobile']):'';
+        $city_id = isset($order_info['city_id'])?intval($order_info['city_id']):0;
+        $address = isset($order_info['address'])?intval($order_info['address']):'';
+        $cost_price = isset($order_info['cost_price'])?floatval($order_info['cost_price']):0.0;
+        $total_price = isset($order_info['total_price'])?floatval($order_info['total_price']):0.0;
+        $strike_price = isset($order_info['strike_price'])?floatval($order_info['strike_price']):0.0;
+        $shipping_price = isset($order_info['shipping_price'])?floatval($order_info['shipping_price']):0.0;
+        $add_time = time();
+        $update_time = $add_time;
+
+        //开始事务
+        $this->order->begin();
+
+        //整理订单商品信息
+        $order_goods_list = array();
+        $goods = new Goods();
+        foreach ($goods_info as $goods_id => $num) {
+            $goods_id = intval($goods_id);
+            $num = intval($num);
+            if ($num < 1) {
+                continue;
+            }
+            //获取商品信息
+            $goods_info = $goods->getGoodsInfo($goods_id);
+            if (empty($goods_info)) {
+                $this->order->rollback();
+                return 0;//商品不存在
+            }
+            $flag = true;
+            if (!$goods_info['unlimited_stock']) {
+                $flag = $goods->decreaseStock($goods_id, $num);//尝试减少库存
+            }
+            if (!$flag) {
+                $this->order->rollback();
+                return 0;//购买数大于商品剩余库存数
+            }
+            $data = array();
+            $data['goods_id'] = $goods_id;
+            $data['num'] = $num;
+            $data['cost_price'] = $goods_info['cost_price'];
+            $data['net_price'] = $goods_info['net_price'];
+            $data['price'] = $goods_info['price'];
+            $data['strike_price'] = $goods_info['price'];
+            $order_goods_list[] = $data;
+        }
+
+        if (empty($order_goods_list)) {
+            $this->order->rollback();
+            return 0;//没有要购买的商品
+        }
+
+        //整理价格
+        if (empty($cost_price)) {
+            foreach ($order_goods_list as $row) {
+                $cost_price += $row['cost_price'] * $row['num'];
+            }
+        }
+        if (empty($strike_price)) {
+            foreach ($order_goods_list as $row) {
+                $strike_price += $row['strike_price'] * $row['num'];
+            }
+        }
+        if (empty($total_price)) {
+            $total_price = $strike_price + $shipping_price;//订单总价=商品成交价格+运费
+        }
+
+        //创建订单
+        $data = array();
+        $data['order_no'] = $order_no;
+        $data['type_id'] = $type_id;
+        $data['user_id'] = $user_id;
+        $data['zip'] = $zip;
+        $data['mobile'] = $mobile;
+        $data['city_id'] = $city_id;
+        $data['address'] = $address;
+        $data['cost_price'] = $cost_price;
+        $data['total_price'] = $total_price;
+        $data['strike_price'] = $strike_price;
+        $data['shipping_price'] = $shipping_price;
+        $data['add_time'] = $add_time;
+        $data['update_time'] = $update_time;
+        $data['status'] = 0;
+        $order_id = $this->order->data($data)->insert();
+        if ($order_id < 1) {
+            $this->order->rollback();
+            return 0;//订单创建失败
+        }
+        foreach ($order_goods_list as $key => $row) {
+            $order_goods_list[$key]['order_id'] = $order_id;
+        }
+        foreach ($order_goods_list as $row) {
+            $this->goods->data($data)->insert();
+        }
+        $this->order->commit();
+        $this->trigger($order_id, self::AFTER_CREATE);//触发事件
+        return $order_id;
+    }
+
+    /**
+     * 确认订单
+     */
+    public function confirmOrder()
     {
 
     }
+
+    /**
+     * 支付订单
+     */
+    public function payOrder()
+    {
+
+    }
+
+    /**
+     * 完成订单
+     */
+    public function completeOrder()
+    {
+
+    }
+
 
     /**
      * 编辑订单
@@ -164,7 +305,7 @@ class Order
         if ($order_id < 1) {
             return 0;
         }
-        return $this->order->where(array('order_id' => $order_id))->data(array('status' => -1))->update();
+        return $this->order->where(array('order_id' => $order_id))->data(array('status' => -1, 'update_time' => time()))->update();
     }
 
     /**

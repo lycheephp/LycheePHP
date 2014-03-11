@@ -16,6 +16,7 @@ namespace Lychee\Goods;
 
 use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
+use Lychee\Base\MySQL\Operator as Operator;
 
 /**
  * 产品模块逻辑类
@@ -52,6 +53,44 @@ class Goods
         $this->goods = new QueryHelper('goods', $db_name);
         $this->category = new QueryHelper('goods_category', $db_name);
         $this->attribute = new QueryHelper('goods_attribute', $db_name);
+    }
+
+    /**
+     * 增加库存
+     * @param int $goods_id
+     * @param int $num
+     * @return int
+     */
+    public function increaseStock($goods_id, $num)
+    {
+        $goods_id = intval($goods_id);
+        if ($goods_id < 1) {
+            return 0;
+        }
+        $num = intval($num);
+        if ($num < 1) {
+            return 0;
+        }
+        return $this->goods->increment('stock', $num);
+    }
+
+    /**
+     * 减少库存
+     * @param int $goods_id
+     * @param int $num
+     * @return int
+     */
+    public function decreaseStock($goods_id, $num)
+    {
+        $goods_id = intval($goods_id);
+        if ($goods_id < 1) {
+            return 0;
+        }
+        $num = intval($num);
+        if ($num < 1) {
+            return 0;
+        }
+        return $this->goods->where(array('stock' => array(Operator::QUERY_GTE, $num)))->decrement('stock', $num);
     }
 
     /**

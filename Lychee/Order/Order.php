@@ -311,15 +311,63 @@ class Order
      */
     public function payOrder($order_id)
     {
-
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return 0;
+        }
+        $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
+        if (empty($result)) {
+            return 0;//不存在该订单;
+        }
+        if ($result['status'] != 1) {
+            return 0;//订单不能被支付
+        }
+        $flag = $this->trigger($order_id, self::BEFORE_PAY);//触发事件
+        if (!$flag) {
+            return 0;
+        }
+        $this->order->begin();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => 2))->update();
+        $flag = $this->trigger($order_id, self::AFTER_PAY);//触发事件
+        if (!$flag) {
+            $this->order->rollback();
+            return 0;
+        }
+        $this->order->commit();
+        return $order_id;
     }
 
     /**
      * 完成订单
+     * @param int $order_id
+     * @return int
      */
-    public function completeOrder()
+    public function completeOrder($order_id)
     {
-
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return 0;
+        }
+        $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
+        if (empty($result)) {
+            return 0;//不存在该订单;
+        }
+        if ($result['status'] != 3) {
+            return 0;//订单不能被完成
+        }
+        $flag = $this->trigger($order_id, self::BEFORE_COMPLETE);//触发事件
+        if (!$flag) {
+            return 0;
+        }
+        $this->order->begin();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => 4))->update();
+        $flag = $this->trigger($order_id, self::AFTER_COMPLETE);//触发事件
+        if (!$flag) {
+            $this->order->rollback();
+            return 0;
+        }
+        $this->order->commit();
+        return $order_id;
     }
 
 
@@ -342,7 +390,9 @@ class Order
         if ($order_id < 1) {
             return 0;
         }
-        return $this->order->where(array('order_id' => $order_id))->data(array('status' => -1, 'update_time' => time()))->update();
+        $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => -1, 'update_time' => time()))->update();
+        //TODO 还原库存
+        return $flag;
     }
 
     /**

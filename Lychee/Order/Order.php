@@ -77,7 +77,7 @@ class Order
      * 订单商品表查询类
      * @var QueryHelper
      */
-    private $goods;
+    private $order_goods;
 
     /**
      * 构造器
@@ -86,7 +86,7 @@ class Order
     {
         $db_name = Config::get('order.mysql.db_name');
         $this->order = new QueryHelper('order', $db_name);
-        $this->goods = new QueryHelper('order_goods', $db_name);
+        $this->order_goods = new QueryHelper('order_goods', $db_name);
     }
 
     /**
@@ -254,7 +254,7 @@ class Order
             $order_goods_list[$key]['order_id'] = $order_id;
         }
         foreach ($order_goods_list as $row) {
-            $this->goods->data($data)->insert();
+            $this->order_goods->data($data)->insert();
         }
         $flag = $this->trigger($order_id, self::AFTER_CREATE);//触发事件
         if (!$flag) {
@@ -391,7 +391,14 @@ class Order
             return 0;
         }
         $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => -1, 'update_time' => time()))->update();
-        //TODO 还原库存
+        //还原库存
+        $order_goods_list = $this->order_goods->where(array('order_id' => $order_id))->select();
+        $goods = new Goods();
+        foreach ($order_goods_list as $row) {
+            $goods_id = $row['goods_id'];
+            $num = $row['num'];
+            $goods->increaseStock($goods_id, $num);
+        }
         return $flag;
     }
 

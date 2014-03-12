@@ -263,10 +263,24 @@ class Order
 
     /**
      * 确认订单
+     * @param int $order_id
+     * @param array $order_info
+     * @return int
      */
-    public function confirmOrder()
+    public function confirmOrder($order_id, array $order_info = array())
     {
-
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return 0;
+        }
+        $this->trigger($order_id, self::BEFORE_CONFIRM);//触发事件
+        $order_info['status'] = 1;//订单确认
+        if (!empty($order_info)) {
+            unset($order_info['order_id']);
+            unset($order_info['order_no']);
+            $this->order->where(array('order_id' => $order_id))->data($order_info)->update();
+        }
+        $this->trigger($order_id, self::AFTER_CONFIRM);//触发事件
     }
 
     /**

@@ -256,8 +256,12 @@ class Order
         foreach ($order_goods_list as $row) {
             $this->goods->data($data)->insert();
         }
+        $flag = $this->trigger($order_id, self::AFTER_CREATE);//触发事件
+        if (!$flag) {
+            $this->order->rollback();
+            return 0;
+        }
         $this->order->commit();
-        $this->trigger($order_id, self::AFTER_CREATE);//触发事件
         return $order_id;
     }
 
@@ -273,20 +277,39 @@ class Order
         if ($order_id < 1) {
             return 0;
         }
-        $this->trigger($order_id, self::BEFORE_CONFIRM);//触发事件
+        $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
+        if (empty($result)) {
+            return 0;//不存在该订单;
+        }
+        if ($result['status'] != 0) {
+            return 0;//订单不能被确认
+        }
+        $flag = $this->trigger($order_id, self::BEFORE_CONFIRM);//触发事件
+        if (!$flag) {
+            return 0;
+        }
+        $this->order->begin();
         $order_info['status'] = 1;//订单确认
         if (!empty($order_info)) {
             unset($order_info['order_id']);
             unset($order_info['order_no']);
             $this->order->where(array('order_id' => $order_id))->data($order_info)->update();
         }
-        $this->trigger($order_id, self::AFTER_CONFIRM);//触发事件
+        $flag = $this->trigger($order_id, self::AFTER_CONFIRM);//触发事件
+        if (!$flag) {
+            $this->order->rollback();
+            return 0;
+        }
+        $this->order->commit();
+        return $order_id;
     }
 
     /**
      * 支付订单
+     * @param int $order_id
+     * @return int
      */
-    public function payOrder()
+    public function payOrder($order_id)
     {
 
     }

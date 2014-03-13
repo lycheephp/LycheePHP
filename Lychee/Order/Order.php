@@ -16,10 +16,9 @@ namespace Lychee\Order;
 
 use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
-use Lychee\Goods\Goods as Goods;
 
 /**
- * 订单模块逻辑类
+ * 订单模块订单逻辑类
  * @author Samding
  * @package Lychee\Order
  */

@@ -12,16 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Lychee\Goods;
+namespace Lychee\Order;
 
 use Lychee\Config as Config;
 use Lychee\Base\MySQL\QueryHelper as QueryHelper;
 use Lychee\Base\MySQL\Operator as Operator;
 
 /**
- * 产品模块逻辑类
+ * 订单模块商品逻辑类
  * @author Samding
- * @package Lychee\Goods
+ * @package Lychee\Order;
  */
 class Goods
 {
@@ -49,7 +49,7 @@ class Goods
      */
     public function __construct()
     {
-        $db_name = Config::get('goods.mysql.db_name');
+        $db_name = Config::get('order.mysql.db_name');
         $this->goods = new QueryHelper('goods', $db_name);
         $this->category = new QueryHelper('goods_category', $db_name);
         $this->attribute = new QueryHelper('goods_attribute', $db_name);

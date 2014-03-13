@@ -290,11 +290,10 @@ class Order
         }
         $this->order->begin();
         $order_info['status'] = 1;//订单确认
-        if (!empty($order_info)) {
-            unset($order_info['order_id']);
-            unset($order_info['order_no']);
-            $this->order->where(array('order_id' => $order_id))->data($order_info)->update();
-        }
+        $order_info['update_time'] = time();
+        unset($order_info['order_id']);
+        unset($order_info['order_no']);
+        $this->order->where(array('order_id' => $order_id))->data($order_info)->update();
         $flag = $this->trigger($order_id, self::AFTER_CONFIRM);//触发事件
         if (!$flag) {
             $this->order->rollback();
@@ -327,7 +326,7 @@ class Order
             return 0;
         }
         $this->order->begin();
-        $this->order->where(array('order_id' => $order_id))->data(array('status' => 2))->update();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => 2, 'update_time' => time()))->update();
         $flag = $this->trigger($order_id, self::AFTER_PAY);//触发事件
         if (!$flag) {
             $this->order->rollback();
@@ -360,7 +359,7 @@ class Order
             return 0;
         }
         $this->order->begin();
-        $this->order->where(array('order_id' => $order_id))->data(array('status' => 4))->update();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => 3, 'update_time' => time()))->update();
         $flag = $this->trigger($order_id, self::AFTER_COMPLETE);//触发事件
         if (!$flag) {
             $this->order->rollback();

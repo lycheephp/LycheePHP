@@ -254,7 +254,7 @@ class Order
             $order_goods_list[$key]['order_id'] = $order_id;
         }
         foreach ($order_goods_list as $row) {
-            $this->order_goods->data($data)->insert();
+            $this->order_goods->data($row)->insert();
         }
         $flag = $this->trigger($order_id, self::AFTER_CREATE);//触发事件
         if (!$flag) {
@@ -373,10 +373,23 @@ class Order
 
     /**
      * 编辑订单
+     * @param array $data
+     * @param int $order_id
+     * @return int
      */
-    public function editOrder()
+    public function editOrder(array $data, $order_id)
     {
-
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return 0;
+        }
+        //不出不能编辑的字段
+        unset($data['order_id']);
+        unset($data['order_no']);
+        unset($data['type_id']);
+        unset($data['status']);
+        $data['update_time'] = time();
+        return $this->order->where(array('order_id' => $order_id))->data($data)->update();
     }
 
     /**

@@ -61,6 +61,31 @@ class Order
     const AFTER_COMPLETE = 'after_complete';
 
     /**
+     * 状态:已取消
+     */
+    const STATUS_CANCELED = -1;
+
+    /**
+     * 状态:已创建
+     */
+    const STATUS_CREATED = 0;
+
+    /**
+     * 状态:已确认
+     */
+    const STATUS_CONFIRMED = 1;
+
+    /**
+     * 状态:已支付
+     */
+    const STATUS_PAID = 2;
+
+    /**
+     * 状态:已完成
+     */
+    const STATUS_COMPLETED = 3;
+
+    /**
      * 事件钩子
      * @var array
      */
@@ -243,7 +268,7 @@ class Order
         $data['shipping_price'] = $shipping_price;
         $data['add_time'] = $add_time;
         $data['update_time'] = $update_time;
-        $data['status'] = 0;
+        $data['status'] = self::STATUS_CREATED;
         $order_id = $this->order->data($data)->insert();
         if ($order_id < 1) {
             $this->order->rollback();
@@ -276,19 +301,19 @@ class Order
         if ($order_id < 1) {
             return 0;
         }
+        $this->order->begin();//事务开始
         $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
         if (empty($result)) {
             return 0;//不存在该订单;
         }
-        if ($result['status'] != 0) {
+        if ($result['status'] != self::STATUS_CREATED) {
             return 0;//订单不能被确认
         }
         $flag = $this->trigger($order_id, self::BEFORE_CONFIRM);//触发事件
         if (!$flag) {
             return 0;
         }
-        $this->order->begin();
-        $order_info['status'] = 1;//订单确认
+        $order_info['status'] = self::STATUS_CONFIRMED;//订单确认
         $order_info['update_time'] = time();
         unset($order_info['order_id']);
         unset($order_info['order_no']);
@@ -313,19 +338,19 @@ class Order
         if ($order_id < 1) {
             return 0;
         }
+        $this->order->begin();
         $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
         if (empty($result)) {
             return 0;//不存在该订单;
         }
-        if ($result['status'] != 1) {
+        if ($result['status'] != self::STATUS_CONFIRMED) {
             return 0;//订单不能被支付
         }
         $flag = $this->trigger($order_id, self::BEFORE_PAY);//触发事件
         if (!$flag) {
             return 0;
         }
-        $this->order->begin();
-        $this->order->where(array('order_id' => $order_id))->data(array('status' => 2, 'update_time' => time()))->update();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_PAID, 'update_time' => time()))->update();
         $flag = $this->trigger($order_id, self::AFTER_PAY);//触发事件
         if (!$flag) {
             $this->order->rollback();
@@ -346,19 +371,19 @@ class Order
         if ($order_id < 1) {
             return 0;
         }
+        $this->order->begin();
         $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
         if (empty($result)) {
             return 0;//不存在该订单;
         }
-        if ($result['status'] != 3) {
+        if ($result['status'] != self::STATUS_PAID) {
             return 0;//订单不能被完成
         }
         $flag = $this->trigger($order_id, self::BEFORE_COMPLETE);//触发事件
         if (!$flag) {
             return 0;
         }
-        $this->order->begin();
-        $this->order->where(array('order_id' => $order_id))->data(array('status' => 3, 'update_time' => time()))->update();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_COMPLETED, 'update_time' => time()))->update();
         $flag = $this->trigger($order_id, self::AFTER_COMPLETE);//触发事件
         if (!$flag) {
             $this->order->rollback();
@@ -401,7 +426,17 @@ class Order
         if ($order_id < 1) {
             return 0;
         }
-        $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => -1, 'update_time' => time()))->update();
+        $this->order->begin();
+        //检查订单状态
+        $order_info = $this->getOrderInfo($order_id);
+        if (empty($order_info)) {
+            return 0;//订单不存在
+        }
+        $order_status = $order_info['status'];
+        if (!($order_status == self::STATUS_CANCELED || $order_status == self::STATUS_CREATED || $order_status == self::STATUS_CREATED)) {
+            return 0;//订单不正取消
+        }
+        $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_CANCELED, 'update_time' => time()))->update();
         //还原库存
         $order_goods_list = $this->order_goods->where(array('order_id' => $order_id))->select();
         $goods = new Goods();
@@ -410,6 +445,7 @@ class Order
             $num = $row['num'];
             $goods->increaseStock($goods_id, $num);
         }
+        $this->order->commit();
         return $flag;
     }
 

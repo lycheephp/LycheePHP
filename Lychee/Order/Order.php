@@ -61,6 +61,56 @@ class Order
     const AFTER_COMPLETE = 'after_complete';
 
     /**
+     * 状态:已取消
+     */
+    const STATUS_CANCELED = -1;
+
+    /**
+     * 状态:已创建
+     */
+    const STATUS_CREATED = 0;
+
+    /**
+     * 状态:已确认
+     */
+    const STATUS_CONFIRMED = 1;
+
+    /**
+     * 状态:已支付
+     */
+    const STATUS_PAID = 2;
+
+    /**
+     * 状态:已完成
+     */
+    const STATUS_COMPLETED = 3;
+
+    /**
+     * 错误:商品不存在
+     */
+    const ERR_GOODS_NOT_EXIST = -1;
+
+    /**
+     * 错误:商品库存不足
+     */
+    const ERR_OUT_OF_STOCK = -2;
+
+    /**
+     * 错误:订单不存在
+     */
+    const ERR_ORDER_NOT_EXIST = -3;
+
+    /**
+     * 错误:订单状态不正确
+     */
+    const ERR_ORDER_STATUS = -4;
+
+    /**
+     * 错误:内部
+     */
+    const ERR_INTERNAL = -99;
+
+    /**
      * 事件钩子
      * @var array
      */
@@ -76,7 +126,7 @@ class Order
      * 订单商品表查询类
      * @var QueryHelper
      */
-    private $order_goods;
+    private $order_detail;
 
     /**
      * 构造器
@@ -85,7 +135,7 @@ class Order
     {
         $db_name = Config::get('order.mysql.db_name');
         $this->order = new QueryHelper('order', $db_name);
-        $this->order_goods = new QueryHelper('order_goods', $db_name);
+        $this->order_detail = new QueryHelper('order_detail', $db_name);
     }
 
     /**
@@ -141,7 +191,7 @@ class Order
      * 生成订单号码
      * @return string
      */
-    private static  function generateOrderNo()
+    private static function generateOrderNo()
     {
         return date('YmdHis') . mt_rand(0, 9) . uniqid();
     }
@@ -155,7 +205,7 @@ class Order
     public function createOrder(array $order_info, array $goods_info)
     {
         if (empty($order_info) || empty($goods_info)) {
-            return 0;
+            return self::ERR_INTERNAL;
         }
         //整理订单信息
         $order_no = isset($order_info['order_no'])?$order_info['order_no']:self::generateOrderNo();
@@ -186,9 +236,9 @@ class Order
             }
             //获取商品信息
             $goods_info = $goods->getGoodsInfo($goods_id);
-            if (empty($goods_info)) {
+            if (empty($goods_info) || $goods_info['status'] == 0) {
                 $this->order->rollback();
-                return 0;//商品不存在
+                return self::ERR_GOODS_NOT_EXIST;//商品不存在
             }
             $flag = true;
             if (!$goods_info['unlimited_stock']) {
@@ -196,7 +246,7 @@ class Order
             }
             if (!$flag) {
                 $this->order->rollback();
-                return 0;//购买数大于商品剩余库存数
+                return self::ERR_OUT_OF_STOCK;//购买数大于商品剩余库存数
             }
             $data = array();
             $data['goods_id'] = $goods_id;
@@ -210,7 +260,7 @@ class Order
 
         if (empty($order_goods_list)) {
             $this->order->rollback();
-            return 0;//没有要购买的商品
+            return self::ERR_GOODS_NOT_EXIST;//没有要购买的商品
         }
 
         //整理价格
@@ -243,22 +293,22 @@ class Order
         $data['shipping_price'] = $shipping_price;
         $data['add_time'] = $add_time;
         $data['update_time'] = $update_time;
-        $data['status'] = 0;
+        $data['status'] = self::STATUS_CREATED;
         $order_id = $this->order->data($data)->insert();
         if ($order_id < 1) {
             $this->order->rollback();
-            return 0;//订单创建失败
+            return self::ERR_INTERNAL;//订单创建失败
         }
         foreach ($order_goods_list as $key => $row) {
             $order_goods_list[$key]['order_id'] = $order_id;
         }
         foreach ($order_goods_list as $row) {
-            $this->order_goods->data($row)->insert();
+            $this->order_detail->data($row)->insert();
         }
         $flag = $this->trigger($order_id, self::AFTER_CREATE);//触发事件
         if (!$flag) {
             $this->order->rollback();
-            return 0;
+            return self::ERR_INTERNAL;
         }
         $this->order->commit();
         return $order_id;
@@ -274,21 +324,21 @@ class Order
     {
         $order_id = intval($order_id);
         if ($order_id < 1) {
-            return 0;
+            return self::ERR_ORDER_NOT_EXIST;
         }
+        $this->order->begin();//事务开始
         $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
         if (empty($result)) {
-            return 0;//不存在该订单;
+            return self::ERR_ORDER_NOT_EXIST;//不存在该订单;
         }
-        if ($result['status'] != 0) {
-            return 0;//订单不能被确认
+        if ($result['status'] != self::STATUS_CREATED) {
+            return self::ERR_ORDER_STATUS;//订单不能被确认
         }
         $flag = $this->trigger($order_id, self::BEFORE_CONFIRM);//触发事件
         if (!$flag) {
-            return 0;
+            return self::ERR_INTERNAL;
         }
-        $this->order->begin();
-        $order_info['status'] = 1;//订单确认
+        $order_info['status'] = self::STATUS_CONFIRMED;//订单确认
         $order_info['update_time'] = time();
         unset($order_info['order_id']);
         unset($order_info['order_no']);
@@ -296,7 +346,7 @@ class Order
         $flag = $this->trigger($order_id, self::AFTER_CONFIRM);//触发事件
         if (!$flag) {
             $this->order->rollback();
-            return 0;
+            return self::ERR_INTERNAL;
         }
         $this->order->commit();
         return $order_id;
@@ -311,25 +361,25 @@ class Order
     {
         $order_id = intval($order_id);
         if ($order_id < 1) {
-            return 0;
+            return self::ERR_ORDER_NOT_EXIST;
         }
+        $this->order->begin();
         $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
         if (empty($result)) {
-            return 0;//不存在该订单;
+            return self::ERR_ORDER_NOT_EXIST;//不存在该订单;
         }
-        if ($result['status'] != 1) {
-            return 0;//订单不能被支付
+        if ($result['status'] != self::STATUS_CONFIRMED) {
+            return self::ERR_ORDER_STATUS;//订单不能被支付
         }
         $flag = $this->trigger($order_id, self::BEFORE_PAY);//触发事件
         if (!$flag) {
-            return 0;
+            return self::ERR_INTERNAL;
         }
-        $this->order->begin();
-        $this->order->where(array('order_id' => $order_id))->data(array('status' => 2, 'update_time' => time()))->update();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_PAID, 'update_time' => time()))->update();
         $flag = $this->trigger($order_id, self::AFTER_PAY);//触发事件
         if (!$flag) {
             $this->order->rollback();
-            return 0;
+            return self::ERR_INTERNAL;
         }
         $this->order->commit();
         return $order_id;
@@ -344,25 +394,25 @@ class Order
     {
         $order_id = intval($order_id);
         if ($order_id < 1) {
-            return 0;
+            return self::ERR_ORDER_NOT_EXIST;
         }
+        $this->order->begin();
         $result = $this->order->where(array('order_id' => $order_id))->field('status')->select(true);
         if (empty($result)) {
-            return 0;//不存在该订单;
+            return self::ERR_ORDER_NOT_EXIST;//不存在该订单;
         }
-        if ($result['status'] != 3) {
-            return 0;//订单不能被完成
+        if ($result['status'] != self::STATUS_PAID) {
+            return self::ERR_ORDER_STATUS;//订单不能被完成
         }
         $flag = $this->trigger($order_id, self::BEFORE_COMPLETE);//触发事件
         if (!$flag) {
-            return 0;
+            return self::ERR_INTERNAL;
         }
-        $this->order->begin();
-        $this->order->where(array('order_id' => $order_id))->data(array('status' => 3, 'update_time' => time()))->update();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_COMPLETED, 'update_time' => time()))->update();
         $flag = $this->trigger($order_id, self::AFTER_COMPLETE);//触发事件
         if (!$flag) {
             $this->order->rollback();
-            return 0;
+            return self::ERR_INTERNAL;
         }
         $this->order->commit();
         return $order_id;
@@ -379,7 +429,7 @@ class Order
     {
         $order_id = intval($order_id);
         if ($order_id < 1) {
-            return 0;
+            return self::ERR_ORDER_NOT_EXIST;
         }
         //不出不能编辑的字段
         unset($data['order_id']);
@@ -399,17 +449,28 @@ class Order
     {
         $order_id = intval($order_id);
         if ($order_id < 1) {
-            return 0;
+            return self::ERR_ORDER_NOT_EXIST;
         }
-        $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => -1, 'update_time' => time()))->update();
+        $this->order->begin();
+        //检查订单状态
+        $order_info = $this->getOrderInfo($order_id);
+        if (empty($order_info)) {
+            return self::ERR_ORDER_NOT_EXIST;//订单不存在
+        }
+        $order_status = $order_info['status'];
+        if (!($order_status == self::STATUS_CANCELED || $order_status == self::STATUS_CREATED || $order_status == self::STATUS_CREATED)) {
+            return self::ERR_ORDER_STATUS;//订单不正取消
+        }
+        $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_CANCELED, 'update_time' => time()))->update();
         //还原库存
-        $order_goods_list = $this->order_goods->where(array('order_id' => $order_id))->select();
+        $order_goods_list = $this->order_detail->where(array('order_id' => $order_id))->select();
         $goods = new Goods();
         foreach ($order_goods_list as $row) {
             $goods_id = $row['goods_id'];
             $num = $row['num'];
             $goods->increaseStock($goods_id, $num);
         }
+        $this->order->commit();
         return $flag;
     }
 

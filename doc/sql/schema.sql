@@ -225,10 +225,10 @@ CREATE TABLE `attachment_image` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for goods
+-- Table structure for order_goods
 -- ----------------------------
-DROP TABLE IF EXISTS `goods`;
-CREATE TABLE `goods` (
+DROP TABLE IF EXISTS `order_goods`;
+CREATE TABLE `order_goods` (
   `goods_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `cate_id` int(10) unsigned NOT NULL COMMENT '分类ID',
   `name` varchar(100) NOT NULL COMMENT '商品名称',
@@ -249,15 +249,30 @@ CREATE TABLE `goods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of goods
+-- Records of order_goods
 -- ----------------------------
 
+-- ----------------------------
+-- Table structure for order_goods_attribute
+-- ----------------------------
+DROP TABLE IF EXISTS `order_goods_attribute`;
+CREATE TABLE `order_goods_attribute` (
+  `attr_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '属性ID',
+  `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID',
+  `name` varchar(50) NOT NULL COMMENT '属性名',
+  `value` varchar(50) NOT NULL COMMENT '属性值',
+  PRIMARY KEY (`attr_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for goods_category
+-- Records of order_goods_attribute
 -- ----------------------------
-DROP TABLE IF EXISTS `goods_category`;
-CREATE TABLE `goods_category` (
+
+-- ----------------------------
+-- Table structure for order_goods_category
+-- ----------------------------
+DROP TABLE IF EXISTS `order_goods_category`;
+CREATE TABLE `order_goods_category` (
   `cate_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '分类ID',
   `parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '父分类ID',
   `name` varchar(50) NOT NULL COMMENT '分类名称',
@@ -266,16 +281,8 @@ CREATE TABLE `goods_category` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for goods_attribute
+-- Records of order_goods_category
 -- ----------------------------
-DROP TABLE IF EXISTS `goods_attribute`;
-CREATE TABLE `goods_attribute` (
-  `attr_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '属性ID',
-  `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID',
-  `name` varchar(50) NOT NULL COMMENT '属性名',
-  `value` varchar(50) NOT NULL COMMENT '属性值',
-  PRIMARY KEY (`attr_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for order
@@ -306,10 +313,10 @@ CREATE TABLE `order` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for order_goods
+-- Table structure for order_detail
 -- ----------------------------
-DROP TABLE IF EXISTS `order_goods`;
-CREATE TABLE `order_goods` (
+DROP TABLE IF EXISTS `order_detail`;
+CREATE TABLE `order_detail` (
   `order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
   `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID',
   `num` int(10) unsigned NOT NULL COMMENT '商品数量',
@@ -321,5 +328,5 @@ CREATE TABLE `order_goods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of order_goods
+-- Records of order_detail
 -- ----------------------------

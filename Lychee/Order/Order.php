@@ -153,17 +153,17 @@ class Order
     }
 
     /**
-     * 获取订单的产品信息
+     * 获取订单的产品信息列表
      * @param int $order_id
      * @return array
      */
-    public function getOrderGoodsInfo($order_id)
+    public function getOrderDetailList($order_id)
     {
         $order_id = intval($order_id);
         if ($order_id < 1) {
             return array();
         }
-        $order_info = $this->order->where(array('order_id' => $order_id))->select(true);
+        $order_info = $this->order_detail->where(array('order_id' => $order_id))->select();
         return $order_info;
     }
 

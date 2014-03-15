@@ -402,7 +402,7 @@ class Order
             return self::ERR_ORDER_NOT_EXIST;//不存在该订单;
         }
         if ($result['status'] != self::STATUS_PAID) {
-            return self::ERR_ORDER_STATUS//订单不能被完成
+            return self::ERR_ORDER_STATUS;//订单不能被完成
         }
         $flag = $this->trigger($order_id, self::BEFORE_COMPLETE);//触发事件
         if (!$flag) {

@@ -50,9 +50,9 @@ class Goods
     public function __construct()
     {
         $db_name = Config::get('order.mysql.db_name');
-        $this->goods = new QueryHelper('goods', $db_name);
-        $this->category = new QueryHelper('goods_category', $db_name);
-        $this->attribute = new QueryHelper('goods_attribute', $db_name);
+        $this->goods = new QueryHelper('order_goods', $db_name);
+        $this->category = new QueryHelper('order_goods_category', $db_name);
+        $this->attribute = new QueryHelper('order_goods_attribute', $db_name);
     }
 
     /**

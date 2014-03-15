@@ -126,7 +126,7 @@ class Order
      * 订单商品表查询类
      * @var QueryHelper
      */
-    private $order_goods;
+    private $order_detail;
 
     /**
      * 构造器
@@ -135,7 +135,7 @@ class Order
     {
         $db_name = Config::get('order.mysql.db_name');
         $this->order = new QueryHelper('order', $db_name);
-        $this->order_goods = new QueryHelper('order_goods', $db_name);
+        $this->order_detail = new QueryHelper('order_detail', $db_name);
     }
 
     /**
@@ -303,7 +303,7 @@ class Order
             $order_goods_list[$key]['order_id'] = $order_id;
         }
         foreach ($order_goods_list as $row) {
-            $this->order_goods->data($row)->insert();
+            $this->order_detail->data($row)->insert();
         }
         $flag = $this->trigger($order_id, self::AFTER_CREATE);//触发事件
         if (!$flag) {
@@ -463,7 +463,7 @@ class Order
         }
         $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_CANCELED, 'update_time' => time()))->update();
         //还原库存
-        $order_goods_list = $this->order_goods->where(array('order_id' => $order_id))->select();
+        $order_goods_list = $this->order_detail->where(array('order_id' => $order_id))->select();
         $goods = new Goods();
         foreach ($order_goods_list as $row) {
             $goods_id = $row['goods_id'];

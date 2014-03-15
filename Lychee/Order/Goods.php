@@ -71,7 +71,7 @@ class Goods
         if ($num < 1) {
             return 0;
         }
-        return $this->goods->increment('stock', $num);
+        return $this->goods->where(array('goods_id' => $goods_id))->increment('stock', $num);
     }
 
     /**
@@ -90,7 +90,7 @@ class Goods
         if ($num < 1) {
             return 0;
         }
-        return $this->goods->where(array('stock' => array(Operator::QUERY_GTE, $num)))->decrement('stock', $num);
+        return $this->goods->where(array('goods_id' => $goods_id, 'stock' => array(Operator::QUERY_GTE => $num)))->decrement('stock', $num);
     }
 
     /**

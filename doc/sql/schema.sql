@@ -147,7 +147,7 @@ CREATE TABLE `archive` (
   `sort` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
   `status` tinyint(3) unsigned NOT NULL COMMENT '0:待审核 1:已审核 2:已删除',
   PRIMARY KEY (`archive_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of archive
@@ -163,7 +163,7 @@ CREATE TABLE `archive_category` (
   `name` varchar(50) NOT NULL COMMENT '分类名称',
   `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
   PRIMARY KEY (`cate_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of archive_category
@@ -183,7 +183,7 @@ CREATE TABLE `attachment_album` (
   `add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
   PRIMARY KEY (`album_id`),
   UNIQUE KEY `module` (`module_name`,`module_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of attachment_album
@@ -218,10 +218,58 @@ CREATE TABLE `attachment_image` (
   `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '降序排序',
   `add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
   PRIMARY KEY (`image_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of attachment_image
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for order
+-- ----------------------------
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE `order` (
+  `order_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(255) NOT NULL COMMENT '订单号',
+  `type_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单类型',
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单用户ID',
+  `zip` varchar(50) NOT NULL DEFAULT '' COMMENT '订单邮编',
+  `mobile` varchar(20) NOT NULL DEFAULT '' COMMENT '订单联系方式',
+  `city_id` int(10) NOT NULL DEFAULT '0' COMMENT '送货城市ID',
+  `address` varchar(255) NOT NULL DEFAULT '' COMMENT '订单地址',
+  `cost_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单成本价',
+  `total_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单总价',
+  `strike_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单商品成交价',
+  `shipping_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '运费',
+  `add_time` int(10) unsigned NOT NULL COMMENT '订单添加时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单更新时间',
+  `status` tinyint(3) NOT NULL COMMENT '订单状态 -1:取消 0:订单建立 1:用户确认 2:支付完成 3:处理完毕',
+  PRIMARY KEY (`order_id`),
+  UNIQUE KEY `order_no` (`order_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for order_detail
+-- ----------------------------
+DROP TABLE IF EXISTS `order_detail`;
+CREATE TABLE `order_detail` (
+  `order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
+  `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID',
+  `num` int(10) unsigned NOT NULL COMMENT '商品数量',
+  `cost_price` decimal(10,2) unsigned NOT NULL COMMENT '商品成本单价',
+  `net_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '商品净单价价',
+  `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '商品售单价价',
+  `strike_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '产品成交单价',
+  PRIMARY KEY (`order_id`,`goods_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order_detail
 -- ----------------------------
 
 -- ----------------------------
@@ -282,51 +330,4 @@ CREATE TABLE `order_goods_category` (
 
 -- ----------------------------
 -- Records of order_goods_category
--- ----------------------------
-
--- ----------------------------
--- Table structure for order
--- ----------------------------
-DROP TABLE IF EXISTS `order`;
-CREATE TABLE `order` (
-  `order_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `order_no` varchar(255) NOT NULL COMMENT '订单号',
-  `type_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单类型',
-  `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单用户ID',
-  `zip` varchar(50) NOT NULL DEFAULT '' COMMENT '订单邮编',
-  `mobile` varchar(20) NOT NULL DEFAULT '' COMMENT '订单联系方式',
-  `city_id` int(10) NOT NULL DEFAULT '0' COMMENT '送货城市ID',
-  `address` varchar(255) NOT NULL DEFAULT '' COMMENT '订单地址',
-  `cost_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单成本价',
-  `total_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单总价',
-  `strike_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单商品成交价',
-  `shipping_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '运费',
-  `add_time` int(10) unsigned NOT NULL COMMENT '订单添加时间',
-  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单更新时间',
-  `status` tinyint(3) unsigned NOT NULL COMMENT '订单状态 -1:取消 0:订单建立 1:用户确认 2:支付完成 3:处理完毕',
-  PRIMARY KEY (`order_id`),
-  UNIQUE KEY `order_no` (`order_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of order
--- ----------------------------
-
--- ----------------------------
--- Table structure for order_detail
--- ----------------------------
-DROP TABLE IF EXISTS `order_detail`;
-CREATE TABLE `order_detail` (
-  `order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
-  `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID',
-  `num` int(10) unsigned NOT NULL COMMENT '商品数量',
-  `cost_price` decimal(10,2) unsigned NOT NULL COMMENT '商品成本单价',
-  `net_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '商品净单价价',
-  `price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '商品售单价价',
-  `strike_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '产品成交单价',
-  PRIMARY KEY (`order_id`,`goods_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of order_detail
 -- ----------------------------

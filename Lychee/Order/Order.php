@@ -453,7 +453,43 @@ class Order
      */
     public function recoverOrder($order_id)
     {
-        //TODO
+        $order_id = intval($order_id);
+        if ($order_id < 1) {
+            return self::ERR_ORDER_NOT_EXIST;
+        }
+        $this->order->begin();
+        $order_info = $this->getOrderInfo($order_id);
+        if (empty($order_info)) {
+            return self::ERR_ORDER_NOT_EXIST;//订单不存在
+        }
+        $order_status = $order_info['status'];
+        if ($order_status != self::STATUS_CANCELED) {
+            return self::ERR_ORDER_STATUS;//订单不能恢复
+        }
+        $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_CREATED, 'update_time' => time()))->update();
+        //重新扣除
+        $order_goods_list = $this->order_detail->where(array('order_id' => $order_id))->select();
+        $goods = new Goods();
+        foreach ($order_goods_list as $row) {
+            $goods_id = $row['goods_id'];
+            $num = $row['num'];
+            //获取商品信息
+            $goods_info = $goods->getGoodsInfo($goods_id);
+            if (empty($goods_info) || $goods_info['status'] == 0) {
+                $this->order->rollback();
+                return self::ERR_GOODS_NOT_EXIST;//商品不存在
+            }
+            $flag = 1;
+            if (!$goods_info['unlimited_stock']) {
+                $flag = $goods->decreaseStock($goods_id, $num);//尝试减少库存
+            }
+            if (!$flag) {
+                $this->order->rollback();
+                return self::ERR_OUT_OF_STOCK;//购买数大于商品剩余库存数
+            }
+        }
+        $this->order->commit();
+        return 1;
     }
 
     /**
@@ -475,7 +511,7 @@ class Order
         }
         $order_status = $order_info['status'];
         if (!($order_status == self::STATUS_CANCELED || $order_status == self::STATUS_CREATED || $order_status == self::STATUS_CREATED)) {
-            return self::ERR_ORDER_STATUS;//订单不正取消
+            return self::ERR_ORDER_STATUS;//订单不能取消
         }
         $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_CANCELED, 'update_time' => time()))->update();
         //还原库存

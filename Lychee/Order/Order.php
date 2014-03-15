@@ -193,7 +193,10 @@ class Order
      */
     private static function generateOrderNo()
     {
-        return date('YmdHis') . mt_rand(0, 9) . uniqid();
+        $micro = microtime(true);
+        $rand = ($micro - intval($micro)) * 1000;
+        $rand = intval($rand);
+        return date('YmdHis') . $rand . uniqid();
     }
 
     /**
@@ -228,11 +231,14 @@ class Order
         //整理订单商品信息
         $order_goods_list = array();
         $goods = new Goods();
-        foreach ($goods_info as $goods_id => $num) {
-            $goods_id = intval($goods_id);
-            $num = intval($num);
+        foreach ($goods_info as $value) {
+            if (empty($value) || !isset($value['goods_id']) || !isset($value['num'])) {
+                return self::ERR_INTERNAL;//传入的商品信息不正确
+            }
+            $goods_id = intval($value['goods_id']);
+            $num = intval($value['num']);
             if ($num < 1) {
-                continue;
+                continue;//购买0件，跳过
             }
             //获取商品信息
             $goods_info = $goods->getGoodsInfo($goods_id);
@@ -240,7 +246,7 @@ class Order
                 $this->order->rollback();
                 return self::ERR_GOODS_NOT_EXIST;//商品不存在
             }
-            $flag = true;
+            $flag = 1;
             if (!$goods_info['unlimited_stock']) {
                 $flag = $goods->decreaseStock($goods_id, $num);//尝试减少库存
             }
@@ -441,6 +447,16 @@ class Order
     }
 
     /**
+     * 恢复删除的订单
+     * @param int $order_id
+     * @return int
+     */
+    public function recoverOrder($order_id)
+    {
+        //TODO
+    }
+
+    /**
      * 删除订单
      * @param int $order_id
      * @return int
@@ -514,6 +530,10 @@ class Order
      */
     public function trigger($order_id, $type)
     {
+        if (empty($this->hooks)) {
+            //没有任何事件处理器绑定
+            return true;
+        }
         $order_id = intval($order_id);
         if ($order_id < 1) {
             return false;

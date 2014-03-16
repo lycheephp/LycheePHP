@@ -47,11 +47,13 @@ CREATE TABLE `admin_auth_log` (
   `add_time` int(10) unsigned NOT NULL COMMENT '记录时间',
   `status` tinyint(3) unsigned NOT NULL COMMENT '0:登录失败 1:登录成功',
   PRIMARY KEY (`log_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of admin_auth_log
 -- ----------------------------
+INSERT INTO `admin_auth_log` VALUES ('45', '1', '127.0.0.1', '1393942652', '1');
+INSERT INTO `admin_auth_log` VALUES ('46', '1', '127.0.0.1', '1394979296', '1');
 
 -- ----------------------------
 -- Table structure for admin_menu
@@ -64,7 +66,7 @@ CREATE TABLE `admin_menu` (
   `code` varchar(20) NOT NULL COMMENT '后台菜单代码',
   `sort` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '升序排序',
   PRIMARY KEY (`menu_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of admin_menu
@@ -84,6 +86,9 @@ INSERT INTO `admin_menu` VALUES ('12', '10', '角色管理', 'role_list', '0');
 INSERT INTO `admin_menu` VALUES ('13', '2', '文章', 'archive', '0');
 INSERT INTO `admin_menu` VALUES ('14', '13', '分类管理', 'category_list', '0');
 INSERT INTO `admin_menu` VALUES ('15', '13', '文章管理', 'archive_list', '0');
+INSERT INTO `admin_menu` VALUES ('16', '2', '商品', 'goods', '0');
+INSERT INTO `admin_menu` VALUES ('17', '16', '商品管理', 'goods_list', '5');
+INSERT INTO `admin_menu` VALUES ('18', '16', '分类管理', 'goods_cate_list', '0');
 
 -- ----------------------------
 -- Table structure for admin_privilege
@@ -113,6 +118,9 @@ INSERT INTO `admin_privilege` VALUES ('1', '12');
 INSERT INTO `admin_privilege` VALUES ('1', '13');
 INSERT INTO `admin_privilege` VALUES ('1', '14');
 INSERT INTO `admin_privilege` VALUES ('1', '15');
+INSERT INTO `admin_privilege` VALUES ('1', '16');
+INSERT INTO `admin_privilege` VALUES ('1', '17');
+INSERT INTO `admin_privilege` VALUES ('1', '18');
 
 -- ----------------------------
 -- Table structure for admin_role

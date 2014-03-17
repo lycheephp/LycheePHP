@@ -339,3 +339,20 @@ CREATE TABLE `order_goods_category` (
 -- ----------------------------
 -- Records of order_goods_category
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for order_log
+-- ----------------------------
+DROP TABLE IF EXISTS `order_log`;
+CREATE TABLE `order_log` (
+  `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+  `order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
+  `source_status` tinyint(4) NOT NULL COMMENT '原订单状态',
+  `target_status` tinyint(4) NOT NULL COMMENT '目标订单状态',
+  `add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order_log
+-- ----------------------------

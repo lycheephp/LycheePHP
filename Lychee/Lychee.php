@@ -20,45 +20,12 @@ namespace Lychee;
  * @author Samding
  */
 defined('LYCHEE_ROOT') || define('LYCHEE_ROOT', dirname(__FILE__));
-defined('LYCHEE_DEBUG') || define('LYCHEE_DEBUG', true);
+defined('LYCHEE_DEBUG') || define('LYCHEE_DEBUG', false);
 defined('LYCHEE_RUNTIME') || define('LYCHEE_RUNTIME', LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'runtime');
-include LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'Loader.php';
+
+//加载全局函数
+include LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'function.php';
 
 //初始化自动加载
+include LYCHEE_ROOT . DIRECTORY_SEPARATOR . 'Loader.php';
 Loader::register();
-
-/**
- * 初始化
- * 传入配置数组快速初始化荔枝
- * @param array $config
- */
-function init(array $config = array())
-{
-    Config::init($config);
-}
-
-/**
- * 注册外部模块
- * @param string $module_dir
- */
-function register($module_dir)
-{
-    Config::register($module_dir);
-}
-
-/**
- * 清除*.runtime文件
- */
-function erase_runtime()
-{
-    $handle = opendir(LYCHEE_RUNTIME);
-    $skip = array('.', '..');
-    while ($file = readdir($handle)) {
-        if (in_array($file, $skip)) {
-            continue;
-        }
-        $file_path = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . $file;
-        @unlink($file_path);
-    }
-    closedir($handle);
-}

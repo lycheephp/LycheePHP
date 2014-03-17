@@ -51,7 +51,7 @@ interface InterfaceHandler
     public function onBeforePay($order_id);
 
     /**
-     * 订单支付后出发
+     * 订单支付后触发
      * @param int $order_id
      * @return bool
      */

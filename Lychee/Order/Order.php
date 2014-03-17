@@ -129,6 +129,12 @@ class Order
     private $order_detail;
 
     /**
+     * 订单日志表查询类
+     * @var QueryHelper
+     */
+    private $order_log;
+
+    /**
      * 构造器
      */
     public function __construct()
@@ -136,6 +142,20 @@ class Order
         $db_name = Config::get('order.mysql.db_name');
         $this->order = new QueryHelper('order', $db_name);
         $this->order_detail = new QueryHelper('order_detail', $db_name);
+        $this->order_log = new QueryHelper('order_log', $db_name);
+    }
+
+    /**
+     * 添加订单日志
+     * @param array $data
+     * @return int
+     */
+    public function addLog(array $data)
+    {
+        if (empty($data)) {
+            return 0;
+        }
+        return $this->order_log->data($data)->insert();
     }
 
     /**
@@ -355,6 +375,12 @@ class Order
             return self::ERR_INTERNAL;
         }
         $this->order->commit();
+        $data = array();
+        $data['order_id'] = $order_id;
+        $data['source_status'] = self::STATUS_CREATED;
+        $data['target_status'] = self::STATUS_CONFIRMED;
+        $data['add_time'] = time();
+        $this->addLog($data);
         return $order_id;
     }
 
@@ -388,6 +414,12 @@ class Order
             return self::ERR_INTERNAL;
         }
         $this->order->commit();
+        $data = array();
+        $data['order_id'] = $order_id;
+        $data['source_status'] = self::STATUS_CONFIRMED;
+        $data['target_status'] = self::STATUS_PAID;
+        $data['add_time'] = time();
+        $this->addLog($data);
         return $order_id;
     }
 
@@ -421,6 +453,12 @@ class Order
             return self::ERR_INTERNAL;
         }
         $this->order->commit();
+        $data = array();
+        $data['order_id'] = $order_id;
+        $data['source_status'] = self::STATUS_PAID;
+        $data['target_status'] = self::STATUS_COMPLETED;
+        $data['add_time'] = time();
+        $this->addLog($data);
         return $order_id;
     }
 
@@ -466,7 +504,7 @@ class Order
         if ($order_status != self::STATUS_CANCELED) {
             return self::ERR_ORDER_STATUS;//订单不能恢复
         }
-        $flag = $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_CREATED, 'update_time' => time()))->update();
+        $this->order->where(array('order_id' => $order_id))->data(array('status' => self::STATUS_CREATED, 'update_time' => time()))->update();
         //重新扣除
         $order_goods_list = $this->order_detail->where(array('order_id' => $order_id))->select();
         $goods = new Goods();
@@ -489,6 +527,12 @@ class Order
             }
         }
         $this->order->commit();
+        $data = array();
+        $data['order_id'] = $order_id;
+        $data['source_status'] = self::STATUS_CANCELED;
+        $data['target_status'] = self::STATUS_CREATED;
+        $data['add_time'] = time();
+        $this->addLog($data);
         return 1;
     }
 
@@ -523,6 +567,12 @@ class Order
             $goods->increaseStock($goods_id, $num);
         }
         $this->order->commit();
+        $data = array();
+        $data['order_id'] = $order_id;
+        $data['source_status'] = $order_info['status'];
+        $data['target_status'] = self::STATUS_CANCELED;
+        $data['add_time'] = time();
+        $this->addLog($data);
         return $flag;
     }
 

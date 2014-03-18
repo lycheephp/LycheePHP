@@ -22,6 +22,10 @@ namespace Lychee\Utils;
 class Encrypt
 {
 
+    const TYPE_DES = 'des';
+
+    const TYPE_AES = 'aes';
+
     /**
      * 构造器
      * 禁止实例化
@@ -29,6 +33,32 @@ class Encrypt
     private function __construct()
     {
 
+    }
+
+    /**
+     * 加密
+     * @param string $content
+     * @param string $type
+     * @return string
+     */
+    public static function encrypt($content, $type = self::TYPE_AES)
+    {
+        $method_name = $type . 'Encrypt';
+        $method = new \ReflectionMethod(__CLASS__, $method_name);
+        return $method->invokeArgs(null, array($content));
+    }
+
+    /**
+     * 解谜
+     * @param string $content
+     * @param string $type
+     * @return string
+     */
+    public static function decrypt($content, $type = self::TYPE_AES)
+    {
+        $method_name = $type . 'Decrypt';
+        $method = new \ReflectionMethod(__CLASS__, $method_name);
+        return $method->invokeArgs(null, array($content));
     }
 
     /**

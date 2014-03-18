@@ -285,20 +285,7 @@ class Captcha
      */
     private static function encrypt($content)
     {
-        $key = __CLASS__;
-        $pad_len = 8 - (mb_strlen($content) % 8);
-        for ($i = 0; $i < $pad_len; $i++) {
-            $content .= chr(0);
-        }
-        //3DES CBC mode
-        $td = mcrypt_module_open(MCRYPT_3DES, '', MCRYPT_MODE_CBC, '');
-        mcrypt_generic_init($td, $key, '88002233');
-        $data = mcrypt_generic($td, $content);
-        mcrypt_generic_deinit($td);
-        mcrypt_module_close($td);
-        $data = base64_encode($data);
-        $result = str_replace(PHP_EOL, '', $data);
-        return $result;
+        return Encrypt::encrypt($content);
     }
 
     /**
@@ -309,16 +296,7 @@ class Captcha
      */
     private static function decrypt($content)
     {
-        $key = __CLASS__;
-        $content = base64_decode($content);
-        //3DES CBC mode
-        $td = mcrypt_module_open(MCRYPT_3DES, '', MCRYPT_MODE_CBC, '');
-        mcrypt_generic_init($td, $key, '88002233');
-        $data = mdecrypt_generic($td, $content);
-        mcrypt_generic_deinit($td);
-        mcrypt_module_close($td);
-        $result = str_replace(chr(0), '', $data);
-        return $result;
+        return Encrypt::decrypt($content);
     }
 
     /**

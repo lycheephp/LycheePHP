@@ -14,6 +14,8 @@
  */
 namespace Lychee;
 
+use Lychee\Utils\Encrypt as Encrypt;
+
 /**
  * 荔枝类库配置类
  * @package Lychee
@@ -73,7 +75,7 @@ class Config
     {
         $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . "{$name}.runtime";
         $content = file_get_contents($runtime_file);
-        $temp = self::desDecrypt($content, __CLASS__);
+        $temp = self::decrypt($content, __CLASS__);
         $data = unserialize($temp);
         return $data;
     }
@@ -87,7 +89,7 @@ class Config
     {
         $runtime_file = LYCHEE_RUNTIME . DIRECTORY_SEPARATOR . "{$name}.runtime";
         $temp = serialize($data);
-        $content = self::desEncrypt($temp, __CLASS__);
+        $content = self::encrypt($temp, __CLASS__);
         $handle = fopen($runtime_file, 'w');
         flock($handle, LOCK_EX);
         fputs($handle, $content);
@@ -262,49 +264,22 @@ class Config
     }
 
     /**
-     * 3DES加密
+     * 加密
      * @param string $content
-     * @param string $key 加密密钥
      * @return string
      */
-    private static function desEncrypt($content, $key)
+    private static function encrypt($content)
     {
-        //填充内容至8的倍数
-        $pad_len = 8 - (mb_strlen($content) % 8);
-        for ($i = 0; $i < $pad_len; $i++) {
-            $content .= chr(0);
-        }
-        //使用3des，CBC模式
-        $td = mcrypt_module_open(MCRYPT_3DES, '', MCRYPT_MODE_CBC, '');
-        //开始加密
-        mcrypt_generic_init($td, $key, '88002233');
-        $data = mcrypt_generic($td, $content);
-        mcrypt_generic_deinit($td);
-        mcrypt_module_close($td);
-        //删除回车和换行
-        $data = base64_encode($data);
-        $result = str_replace(PHP_EOL, '', $data);
-        return $result;
+        return Encrypt::encrypt($content);
     }
 
     /**
-     * 3DES解密
+     * 解密
      * @param string $content
-     * @param string $key 加密密钥
      * @return string
      */
-    private static function desDecrypt($content, $key)
+    private static function decrypt($content)
     {
-        $content = base64_decode($content);
-        //使用3des，CBC模式
-        $td = mcrypt_module_open(MCRYPT_3DES, '', MCRYPT_MODE_CBC, '');
-        //开始解密
-        mcrypt_generic_init($td, $key, '88002233');
-        $data = mdecrypt_generic($td, $content);
-        mcrypt_generic_deinit($td);
-        mcrypt_module_close($td);
-        //删除填充
-        $result = str_replace(chr(0), '', $data);
-        return $result;
+        return Encrypt::decrypt($content);
     }
 }

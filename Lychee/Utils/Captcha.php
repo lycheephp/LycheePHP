@@ -342,7 +342,8 @@ class Captcha
             return '';
         }
         $time = time();
-        $data = unserialize(self::decrypt($content));
+        $temp = self::decrypt(trim($content));
+        $data = unserialize($temp);
         if ($data['duration'] + $data['add_time'] < $time && $data['duration'] != 0) {
             return '';
         }

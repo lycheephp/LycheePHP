@@ -90,9 +90,9 @@ class Encrypt
         $key = __CLASS__;
         $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_CBC, '');
         $iv_size = mcrypt_enc_get_iv_size($td);
-        $iv = mb_substr($content, 0, $iv_size);
+        $iv = mb_substr($content, 0, $iv_size, 'latin1');
         mcrypt_generic_init($td, $key, $iv);
-        $data = mdecrypt_generic($td, mb_substr($content, $iv_size));
+        $data = mdecrypt_generic($td, mb_substr($content, $iv_size, null, 'latin1'));
         mcrypt_generic_deinit($td);
         mcrypt_module_close($td);
 
@@ -130,9 +130,9 @@ class Encrypt
         //3DES CBC mode
         $td = mcrypt_module_open(MCRYPT_3DES, '', MCRYPT_MODE_CBC, '');
         $iv_size = mcrypt_enc_get_iv_size($td);
-        $iv = mb_substr($content, 0, $iv_size);
+        $iv = mb_substr($content, 0, $iv_size, 'latin1');
         mcrypt_generic_init($td, $key, $iv);
-        $data = mdecrypt_generic($td, mb_substr($content, $iv_size));
+        $data = mdecrypt_generic($td, mb_substr($content, $iv_size, null, 'latin1'));
         mcrypt_generic_deinit($td);
         mcrypt_module_close($td);
         return $data;
